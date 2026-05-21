@@ -34,6 +34,34 @@ public class GameModel implements ActionListener {
             }
         }
 
+        /**
+         * 
+         * hi sarah, if u notice the back buttons are technically the same, even in the same
+         * positions, so do u want me to refactor this into a single back button that works
+         * for all 3 purposes, or do u want me to keep it like this?
+         * 
+         */
+
+        // if on lobby screen
+        if (thePanel.intGameState == 1) {
+            if (evt.getSource() == lobbyBackButton) {
+                thePanel.intGameState = 0;
+            }
+        }
+
+        // if on help screen
+        if (thePanel.intGameState == 2) {
+            if (evt.getSource() == helpBackButton) {
+                thePanel.intGameState = 0;
+            }
+        }
+
+        // if on credits screen
+        if (thePanel.intGameState == 3) {
+            if (evt.getSource() == creditsBackButton) {
+                thePanel.intGameState = 0;
+            }
+        }
         
     }
 
@@ -88,24 +116,16 @@ public class GameModel implements ActionListener {
         boolean isHelp = thePanel.intGameState == 2;
         boolean isCredits = thePanel.intGameState == 3;
 
-        if (isHome) {
-            titleSpleef.setVisible(isHome);
-            lobbyButton.setVisible(isHome);
-            helpButton.setVisible(isHome);
-            creditsButton.setVisible(isHome);
-        }
+        // if on home screen:
+        titleSpleef.setVisible(isHome);
+        lobbyButton.setVisible(isHome);
+        helpButton.setVisible(isHome);
+        creditsButton.setVisible(isHome);
 
-        if (isLobby) {
-            lobbyBackButton.setVisible(isLobby);
-        }
-
-        if (isHelp) {
-            helpBackButton.setVisible(isHelp);
-        }
-
-        if (isCredits) {
-            creditsBackButton.setVisible(isCredits);
-        }
+        // if on other screen:
+        lobbyBackButton.setVisible(isLobby);
+        helpBackButton.setVisible(isHelp);
+        creditsBackButton.setVisible(isCredits);
     }
 
     // Main Program
