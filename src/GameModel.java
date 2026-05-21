@@ -1,6 +1,7 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.*;
 // import java.util.HashMap;
 // import javax.swing.event.*;
 
@@ -8,16 +9,23 @@ public class GameModel implements ActionListener {
     // Properties
     JFrame theFrame = new JFrame("Spleef");
     GameView thePanel = new GameView();
+
+    // Home Screen
     JLabel titleSpleef = new JLabel("Spleef");
     JButton lobbyButton = new JButton("Lobby");
     JButton helpButton = new JButton("Help");
     JButton creditsButton = new JButton("Credits");
 
-    JButton lobbyBackButton = new JButton("Back");
-    JButton helpBackButton = new JButton("Back");
-    JButton creditsBackButton = new JButton("Back");
+    // Back Buttons
+    JButton backButton = new JButton("Back");
 
-    int[][] map = new int[16][9];
+    // Lobby Buttons
+    JButton alpineTundraMapButton = new JButton("Alpine Tundra Map"); // snow stone dirt
+    JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand stone dirt
+    JButton floatingIslandMapButton = new JButton("Floating Island Map"); // grass dirt sand
+
+    int[][] map = new int[9][16];
+    String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
     
 
     // Methods
@@ -34,35 +42,58 @@ public class GameModel implements ActionListener {
             }
         }
 
-        /**
-         * 
-         * hi sarah, if u notice the back buttons are technically the same, even in the same
-         * positions, so do u want me to refactor this into a single back button that works
-         * for all 3 purposes, or do u want me to keep it like this?
-         * 
-         */
-
         // if on lobby screen
         if (thePanel.intGameState == 1) {
-            if (evt.getSource() == lobbyBackButton) {
+            if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
+            } else if (evt.getSource() == alpineTundraMapButton) {
+                loadMap(mapFiles[0]);
+            } else if (evt.getSource() == oasisDesertMapButton) {
+                loadMap(mapFiles[1]);
+            } else if (evt.getSource() == floatingIslandMapButton) {
+                loadMap(mapFiles[2]);
             }
         }
 
         // if on help screen
         if (thePanel.intGameState == 2) {
-            if (evt.getSource() == helpBackButton) {
+            if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
             }
         }
 
         // if on credits screen
         if (thePanel.intGameState == 3) {
-            if (evt.getSource() == creditsBackButton) {
+            if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
             }
         }
+
+        showCurrentGUI();
         
+    }
+
+    public void loadMap(String fileName) {
+        BufferedReader mapFile = null;
+        try {
+            mapFile = new BufferedReader(new FileReader(fileName));
+            String mapLine;
+            String[] mapSplit;
+
+            for (int r = 0; r < map.length; r++) {
+                mapLine = mapFile.readLine();
+                mapSplit = mapLine.split(",");
+                for (int c = 0; c < map[r].length; c++) {
+                    map[r][c] = Integer.parseInt(mapSplit[c]);
+                }
+            }
+            mapFile.close();
+
+        } catch (FileNotFoundException e) {
+            System.out.println("Error: Could not find the map file: " + fileName);
+        } catch (IOException e) {
+            System.out.println("Error: Could not read the map file: " + fileName);
+        }
     }
 
     // Constructor
@@ -88,18 +119,23 @@ public class GameModel implements ActionListener {
         creditsButton.addActionListener(this);
         thePanel.add(creditsButton);
 
-        // Add Back Buttons
-        lobbyBackButton.setBounds(10, 10, 50, 50);
-        lobbyBackButton.addActionListener(this);
-        thePanel.add(lobbyBackButton);
+        // Add Back Button
+        backButton.setBounds(10, 10, 80, 40);
+        backButton.addActionListener(this);
+        thePanel.add(backButton);
 
-        helpBackButton.setBounds(10, 10, 50, 50);
-        helpBackButton.addActionListener(this);
-        thePanel.add(helpBackButton);
+        // Add Lobby Map Options
+        alpineTundraMapButton.setBounds(100, 300, 300, 100);
+        alpineTundraMapButton.addActionListener(this);
+        thePanel.add(alpineTundraMapButton);
 
-        creditsBackButton.setBounds(10, 10, 50, 50);
-        creditsBackButton.addActionListener(this);
-        thePanel.add(creditsBackButton);
+        oasisDesertMapButton.setBounds(400, 300, 300, 100);
+        oasisDesertMapButton.addActionListener(this);
+        thePanel.add(oasisDesertMapButton);
+
+        floatingIslandMapButton.setBounds(700, 300, 300, 100);
+        floatingIslandMapButton.addActionListener(this);
+        thePanel.add(floatingIslandMapButton);
 
         showCurrentGUI();
 
@@ -122,10 +158,17 @@ public class GameModel implements ActionListener {
         helpButton.setVisible(isHome);
         creditsButton.setVisible(isHome);
 
-        // if on other screen:
-        lobbyBackButton.setVisible(isLobby);
-        helpBackButton.setVisible(isHelp);
-        creditsBackButton.setVisible(isCredits);
+        // if on lobby screen:
+        backButton.setVisible(isLobby);
+        alpineTundraMapButton.setVisible(isLobby);
+        oasisDesertMapButton.setVisible(isLobby);
+        floatingIslandMapButton.setVisible(isLobby);
+
+        // if on help screen:
+        backButton.setVisible(isHelp);
+
+        // if on credits screen:
+        backButton.setVisible(isCredits);
     }
 
     // Main Program
