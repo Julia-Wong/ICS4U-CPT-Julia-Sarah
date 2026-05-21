@@ -24,7 +24,7 @@ public class GameModel implements ActionListener {
     JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand stone dirt
     JButton floatingIslandMapButton = new JButton("Floating Island Map"); // grass dirt sand
 
-    int[][] map = new int[9][16];
+    int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
     
 
