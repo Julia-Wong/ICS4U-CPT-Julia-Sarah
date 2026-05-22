@@ -33,7 +33,7 @@ public class GameModel implements ActionListener {
     JButton connectChat = new JButton("Connect");
 
     // Data
-    int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
+    
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
     int intMapChoice = 0;
     int intPlayersConnected = 0;
@@ -64,6 +64,8 @@ public class GameModel implements ActionListener {
             } else if (evt.getSource() == floatingIslandMapButton) {
                 intMapChoice = 2;
                 loadMap(mapFiles[intMapChoice]);
+            } else if (evt.getSource() == playButton) {
+                thePanel.intGameState = 4;
             }
 
             // Bold Map if Chosen
@@ -112,11 +114,11 @@ public class GameModel implements ActionListener {
             String mapLine;
             String[] mapSplit;
 
-            for (int r = 0; r < map.length; r++) {
+            for (int r = 0; r < thePanel.map.length; r++) {
                 mapLine = mapFile.readLine();
                 mapSplit = mapLine.split(",");
-                for (int c = 0; c < map[r].length; c++) {
-                    map[r][c] = Integer.parseInt(mapSplit[c]);
+                for (int c = 0; c < thePanel.map[r].length; c++) {
+                    thePanel.map[r][c] = Integer.parseInt(mapSplit[c]);
                 }
             }
             mapFile.close();
