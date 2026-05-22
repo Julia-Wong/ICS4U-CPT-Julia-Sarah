@@ -17,16 +17,20 @@ public class GameModel implements ActionListener {
     JButton creditsButton = new JButton("Credits");
 
     // Back Buttons
-    JButton backButton = new JButton("Back");
+    JButton backButton = new JButton("<- Back");
 
     // Lobby Buttons
+    JLabel playersConnectedLabel = new JLabel("4 Players Connected"); // PLACEHOLDER
+    JLabel chooseMapLabel = new JLabel("Choose a Map: ");
     JButton alpineTundraMapButton = new JButton("Alpine Tundra Map"); // snow stone dirt
     JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand stone dirt
     JButton floatingIslandMapButton = new JButton("Floating Island Map"); // grass dirt sand
+    JButton playButton = new JButton("PLAY");
 
     int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
-    
+   int intMapChoice = 0;
+    int intPlayersConnected = 0;
 
     // Methods
     public void actionPerformed(ActionEvent evt) {
@@ -47,12 +51,35 @@ public class GameModel implements ActionListener {
             if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
             } else if (evt.getSource() == alpineTundraMapButton) {
-                loadMap(mapFiles[0]);
+                intMapChoice = 0;
+                loadMap(mapFiles[intMapChoice]);
             } else if (evt.getSource() == oasisDesertMapButton) {
-                loadMap(mapFiles[1]);
+                intMapChoice = 1;
+                loadMap(mapFiles[intMapChoice]);
             } else if (evt.getSource() == floatingIslandMapButton) {
-                loadMap(mapFiles[2]);
+                intMapChoice = 2;
+                loadMap(mapFiles[intMapChoice]);
             }
+
+            // Bold Map if Chosen
+            if (intMapChoice == 0) { // Bold Apline Tundra
+                alpineTundraMapButton.setText("★ ALPINE TUNDRA ★");
+            } else {
+                alpineTundraMapButton.setText("Alpine Tundra Map");
+            }
+
+            if (intMapChoice == 1) { // Bold Oasis Desert
+                oasisDesertMapButton.setText("★ OASIS DESERT ★");
+            } else {
+                oasisDesertMapButton.setText("Oasis Desert Map");
+            }
+
+            if (intMapChoice == 2) { // Bold Floating Island
+                floatingIslandMapButton.setText("★ FLOATING ISLAND ★");
+            } else {
+                floatingIslandMapButton.setText("Floating Island Map");
+            }
+
         }
 
         // if on help screen
@@ -103,7 +130,7 @@ public class GameModel implements ActionListener {
         thePanel.setPreferredSize(new Dimension(1280, 720));
 
         // Add Title
-        titleSpleef.setBounds(600, 100, 400, 100);
+        titleSpleef.setBounds(500, 100, 400, 100);
         thePanel.add(titleSpleef);
 
         // Add Homescreen Buttons
@@ -125,17 +152,29 @@ public class GameModel implements ActionListener {
         thePanel.add(backButton);
 
         // Add Lobby Map Options
-        alpineTundraMapButton.setBounds(100, 300, 300, 100);
+        alpineTundraMapButton.setBounds(100, 500, 300, 100);
         alpineTundraMapButton.addActionListener(this);
         thePanel.add(alpineTundraMapButton);
 
-        oasisDesertMapButton.setBounds(400, 300, 300, 100);
+        oasisDesertMapButton.setBounds(400, 500, 300, 100);
         oasisDesertMapButton.addActionListener(this);
         thePanel.add(oasisDesertMapButton);
 
-        floatingIslandMapButton.setBounds(700, 300, 300, 100);
+        floatingIslandMapButton.setBounds(700, 500, 300, 100);
         floatingIslandMapButton.addActionListener(this);
         thePanel.add(floatingIslandMapButton);
+
+        // Add Lobby Labels
+        playersConnectedLabel.setBounds(500, 200, 400, 100);
+        thePanel.add(playersConnectedLabel);
+
+        chooseMapLabel.setBounds(500, 400, 400, 100);
+        thePanel.add(chooseMapLabel);
+
+        // Add Play Button
+        playButton.setBounds(500, 600, 400, 100);
+        playButton.addActionListener(this);
+        thePanel.add(playButton);
 
         showCurrentGUI();
 
@@ -153,22 +192,25 @@ public class GameModel implements ActionListener {
         boolean isCredits = thePanel.intGameState == 3;
 
         // if on home screen:
-        titleSpleef.setVisible(isHome);
         lobbyButton.setVisible(isHome);
         helpButton.setVisible(isHome);
         creditsButton.setVisible(isHome);
 
         // if on lobby screen:
-        backButton.setVisible(isLobby);
+        playersConnectedLabel.setVisible(isLobby);
+        chooseMapLabel.setVisible(isLobby);
         alpineTundraMapButton.setVisible(isLobby);
         oasisDesertMapButton.setVisible(isLobby);
         floatingIslandMapButton.setVisible(isLobby);
+        playButton.setVisible(isLobby);
 
         // if on help screen:
-        backButton.setVisible(isHelp);
 
         // if on credits screen:
-        backButton.setVisible(isCredits);
+
+        // draw shared J Components
+        backButton.setVisible(isLobby || isHelp || isCredits);
+        titleSpleef.setVisible(isHome || isLobby);
     }
 
     // Main Program
