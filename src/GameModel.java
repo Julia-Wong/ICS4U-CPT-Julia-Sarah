@@ -32,6 +32,15 @@ public class GameModel implements ActionListener {
     JTextField chatInput = new JTextField();
     JButton connectChat = new JButton("Connect");
 
+    // Connecting to Host
+    SuperSocketMaster ssm;
+    boolean isServer = false;
+    JLabel chooseRoleLabel = new JLabel("Choose your network role: ");
+    JButton chooseHostButton = new JButton("Host Game");
+    JButton chooseJoinButton = new JButton("Join Game");
+    int chooseRole = -1;
+    JButton confirmRoleButton = new JButton("Confirm");
+
     // Data
     
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
@@ -66,6 +75,30 @@ public class GameModel implements ActionListener {
                 loadMap(mapFiles[intMapChoice]);
             } else if (evt.getSource() == playButton) {
                 thePanel.intGameState = 4;
+            } else if (evt.getSource() == connectChat) {
+                thePanel.choosingNetworkRole = true;
+
+                if (chooseRole == 0) {
+                    // HOST MODE: Opens port 1337 and listens for players
+                    isServer = true;
+                    ssm = new SuperSocketMaster(1337, this);
+                    ssm.connect();
+                    chatArea.append("[SYSTEM] Server started! Waiting for players...\n");
+                    thePanel.choosingNetworkRole = false;
+                } else if (chooseRole == 1) {
+                    // JOIN MODE: Connects to the host (localhost for testing)
+                    isServer = false;
+                    ssm = new SuperSocketMaster("127.0.0.1", 1337, this);
+                    ssm.connect();
+                    chatArea.append("[SYSTEM] Connecting to server...\n");
+                    thePanel.choosingNetworkRole = false;
+                }
+            } else if (evt.getSource() == chooseHostButton) {
+                chooseRole = 0;
+            } else if (evt.getSource() == chooseJoinButton) {
+                chooseRole = 1;
+            } else if (evt.getSource() == confirmRoleButton) {
+                thePanel.choosingNetworkRole = false;
             }
 
             // Bold Map if Chosen
@@ -195,6 +228,22 @@ public class GameModel implements ActionListener {
         connectChat.addActionListener(this);
         thePanel.add(connectChat);
 
+        // Add Connect Pop-up Panel
+        chooseRoleLabel.setBounds(420, 220, 400, 50);
+        thePanel.add(chooseRoleLabel);
+
+        chooseHostButton.setBounds(420, 270, 100, 50);
+        chooseHostButton.addActionListener(this);
+        thePanel.add(chooseHostButton);
+
+        chooseJoinButton.setBounds(620, 270, 100, 50);
+        chooseJoinButton.addActionListener(this);
+        thePanel.add(chooseJoinButton);
+
+        confirmRoleButton.setBounds(800, 350, 100, 50);
+        confirmRoleButton.addActionListener(this);
+        thePanel.add(confirmRoleButton);
+
         showCurrentGUI();
 
         // Set Frame
@@ -225,6 +274,11 @@ public class GameModel implements ActionListener {
         scrollChatArea.setVisible(isLobby);
         chatInput.setVisible(isLobby);
         connectChat.setVisible(isLobby);
+
+        chooseRoleLabel.setVisible(isLobby && thePanel.choosingNetworkRole);
+        chooseHostButton.setVisible(isLobby && thePanel.choosingNetworkRole);
+        chooseJoinButton.setVisible(isLobby && thePanel.choosingNetworkRole);
+        confirmRoleButton.setVisible(isLobby & thePanel.choosingNetworkRole);
 
         // if on help screen:
 

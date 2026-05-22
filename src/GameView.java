@@ -17,6 +17,8 @@ public class GameView extends JPanel {
     BufferedImage imgSnowSlightlyCracked = null;
     BufferedImage imgSnowCracked = null;
 
+    boolean choosingNetworkRole = false;
+
     // Methods
     public void paintComponent(Graphics g){
         super.paintComponent(g);
@@ -24,7 +26,10 @@ public class GameView extends JPanel {
         if (intGameState == 0) {
             
         } else if (intGameState == 1) {
-
+            if (choosingNetworkRole) {
+                g.setColor(new Color(191, 236, 255));
+                g.fillRect(250, 200, 680, 520);
+            }
         } else if (intGameState == 2) {
 
         } else if (intGameState == 3) {
@@ -64,10 +69,6 @@ public class GameView extends JPanel {
         imgSnowFull = loadImage(".media/fullSnowTile.png");
         imgSnowSlightlyCracked = loadImage(".media/slightCrackedSnowTile.png");
         imgSnowCracked = loadImage(".media/crackedSnowTile.png");
-
-        tileHealth[1][1] = 1;
-        tileHealth[2][1] = 2;
-        tileHealth[3][1] = 3;
 
     }  
     
