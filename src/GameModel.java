@@ -27,14 +27,19 @@ public class GameModel implements ActionListener {
     JButton floatingIslandMapButton = new JButton("Floating Island Map"); // grass dirt sand
     JButton playButton = new JButton("PLAY");
 
+    JTextArea chatArea = new JTextArea();
+    JScrollPane scrollChatArea = new JScrollPane(chatArea);
+    JTextField chatInput = new JTextField();
+    JButton connectChat = new JButton("Connect");
+
+    // Data
     int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
-   int intMapChoice = 0;
+    int intMapChoice = 0;
     int intPlayersConnected = 0;
 
     // Methods
     public void actionPerformed(ActionEvent evt) {
-
         // if on homescreen
         if (thePanel.intGameState == 0) {
             if (evt.getSource() == lobbyButton) {
@@ -176,6 +181,18 @@ public class GameModel implements ActionListener {
         playButton.addActionListener(this);
         thePanel.add(playButton);
 
+        // Add Chat
+        scrollChatArea.setBounds(950, 0, 330, 150);
+        thePanel.add(scrollChatArea);
+
+        chatInput.setBounds(950, 150, 330, 50);
+        chatInput.addActionListener(this);
+        thePanel.add(chatInput);
+
+        connectChat.setBounds(950, 200, 330, 50);
+        connectChat.addActionListener(this);
+        thePanel.add(connectChat);
+
         showCurrentGUI();
 
         // Set Frame
@@ -203,6 +220,9 @@ public class GameModel implements ActionListener {
         oasisDesertMapButton.setVisible(isLobby);
         floatingIslandMapButton.setVisible(isLobby);
         playButton.setVisible(isLobby);
+        scrollChatArea.setVisible(isLobby);
+        chatInput.setVisible(isLobby);
+        connectChat.setVisible(isLobby);
 
         // if on help screen:
 
