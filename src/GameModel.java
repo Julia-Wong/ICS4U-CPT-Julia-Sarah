@@ -2,6 +2,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.ArrayList;
 // import java.util.HashMap;
 // import javax.swing.event.*;
 
@@ -20,7 +21,7 @@ public class GameModel implements ActionListener {
     JButton backButton = new JButton("<- Back");
 
     // Lobby Buttons
-    JLabel playersConnectedLabel = new JLabel("4 Players Connected"); // PLACEHOLDER
+    JLabel playersConnectedLabel = new JLabel();
     JLabel chooseMapLabel = new JLabel("Choose a Map: ");
     JButton alpineTundraMapButton = new JButton("Alpine Tundra Map"); // snow stone dirt
     JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand stone dirt
@@ -62,6 +63,7 @@ public class GameModel implements ActionListener {
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
     int intMapChoice = -1;
     int intPlayersConnected = 0;
+    ArrayList<Player> playerList = new ArrayList<Player>();
 
     // Methods
     public void actionPerformed(ActionEvent evt) {
@@ -81,6 +83,9 @@ public class GameModel implements ActionListener {
         // if on lobby screen
         if (thePanel.intGameState == 1) {
             if (evt.getSource() == backButton) {
+                if (thePanel.intGameState == 1 && !thePanel.choosingNetworkRole && chooseRole == 1) {
+                    intPlayersConnected -= 1;
+                }
                 thePanel.intGameState = 0;
             } else if (evt.getSource() == alpineTundraMapButton) {
                 intMapChoice = 0;
@@ -116,8 +121,17 @@ public class GameModel implements ActionListener {
                     ssm = new SuperSocketMaster("127.0.0.1", 1337, this);
                     ssm.connect();
                     chatArea.append("[SYSTEM] Connecting to server...\n");
+
+                    // add in player
+                    intPlayersConnected += 1;
+                    int randomX = (int) Math.random() * 1280 + 1;
+                    int randomY = (int) Math.random() * 720 + 1;
+                    playerList.add(new Player(intPlayersConnected, randomX, randomY, strPlayerColour));
+                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+
                     thePanel.choosingNetworkRole = false;
                 }
+
             } else if (evt.getSource() == easyButton) {
                 intGameDifficulty = 1;
                 intGameSpeed = 3;
@@ -334,6 +348,10 @@ public class GameModel implements ActionListener {
         boolean isHelp = thePanel.intGameState == 2;
         boolean isCredits = thePanel.intGameState == 3;
 
+        // draw shared J Components
+        backButton.setVisible(isLobby || isHelp || isCredits);
+        titleSpleef.setVisible(isHome || isLobby);
+
         // if on home screen:
         lobbyButton.setVisible(isHome);
         helpButton.setVisible(isHome);
@@ -377,9 +395,6 @@ public class GameModel implements ActionListener {
 
         // if on credits screen:
 
-        // draw shared J Components
-        backButton.setVisible(isLobby || isHelp || isCredits);
-        titleSpleef.setVisible(isHome || isLobby);
     }
 
     // Main Program
