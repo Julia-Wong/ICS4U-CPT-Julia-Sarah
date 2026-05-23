@@ -42,10 +42,7 @@ public class GameView extends JPanel {
         if (intGameState == 0) {
             
         } else if (intGameState == 1) {
-            if (choosingNetworkRole) {
-                g.setColor(new Color(191, 236, 255));
-                g.fillRect(250, 200, 680, 520);
-            }
+
         } else if (intGameState == 2) {
 
         } else if (intGameState == 3) {
@@ -73,7 +70,7 @@ public class GameView extends JPanel {
                         } else if (tileHealth[r][c] == 2 && imgGrassCracked != null) {
                             g.drawImage(imgGrassCracked, c * 80, r * 80, null);
                         } 
-                    } else if (map[r][r] == 2) { // draw dirt
+                    } else if (map[r][c] == 2) { // draw dirt
                         if (tileHealth[r][c] == 0 && imgDirtFull != null) {
                             g.drawImage(imgDirtFull, c * 80, r * 80, null);
                         } else if (tileHealth[r][c] == 1 && imgDirtSlightlyCracked != null) {
