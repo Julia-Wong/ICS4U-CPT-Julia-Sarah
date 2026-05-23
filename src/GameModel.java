@@ -37,7 +37,7 @@ public class GameModel implements ActionListener {
     int chooseRole = -1; // 0=host, 1=player
     int intGameSpeed = 5;
     int intGameDifficulty = 2; // 1=easy, 2=medium, 3=hard
-    int intPlayerColour = 0; // 1=red, 2=blue, 3=green, 4=purple
+    String strPlayerColour;
 
     // Connecting Pop-up
     JLabel chooseRoleLabel = new JLabel("Choose your network role: ");
@@ -46,7 +46,7 @@ public class GameModel implements ActionListener {
     JButton confirmRoleButton = new JButton("Confirm");
 
     // Host-Specific Difficulty Selectors
-    JLabel chooseDifficultyLabel = new JLabel("Choose game dififculty: ");
+    JLabel chooseDifficultyLabel = new JLabel("Choose game difficulty: ");
     JButton easyButton = new JButton("Easy");
     JButton mediumButton = new JButton("Medium");
     JButton hardButton = new JButton("Hard");
@@ -60,7 +60,7 @@ public class GameModel implements ActionListener {
 
     // Data
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
-    int intMapChoice = 0;
+    int intMapChoice = -1;
     int intPlayersConnected = 0;
 
     // Methods
@@ -69,9 +69,39 @@ public class GameModel implements ActionListener {
         if (thePanel.intGameState == 0) {
             if (evt.getSource() == lobbyButton) {
                 thePanel.intGameState = 1;
-
                 thePanel.choosingNetworkRole = true;
                 chooseRole = -1;
+            } else if (evt.getSource() == helpButton) {
+                thePanel.intGameState = 2;
+            } else if (evt.getSource() == creditsButton) {
+                thePanel.intGameState = 3;
+            }
+        }
+
+        // if on lobby screen
+        if (thePanel.intGameState == 1) {
+            if (evt.getSource() == backButton) {
+                thePanel.intGameState = 0;
+            } else if (evt.getSource() == alpineTundraMapButton) {
+                intMapChoice = 0;
+                loadMap(mapFiles[intMapChoice]);
+                chatArea.append("[LOBBY] Map chosen: ALPINE TUNDRA\n");
+            } else if (evt.getSource() == oasisDesertMapButton) {
+                intMapChoice = 1;
+                loadMap(mapFiles[intMapChoice]);
+                chatArea.append("[LOBBY] Map chosen: OASIS DESERT\n");
+            } else if (evt.getSource() == floatingIslandMapButton) {
+                intMapChoice = 2;
+                loadMap(mapFiles[intMapChoice]);
+                chatArea.append("[LOBBY] Map chosen: FLOATING ISLAND\n");
+            } else if (evt.getSource() == playButton) {
+                thePanel.intGameState = 4;
+            } else if (evt.getSource() == chooseHostButton) {
+                chooseRole = 0;
+            } else if (evt.getSource() == chooseJoinButton) {
+                chooseRole = 1;
+            } else if (evt.getSource() == confirmRoleButton) {
+                thePanel.choosingNetworkRole = false;
 
                 if (chooseRole == 0) {
                     // HOST MODE: Opens port 1337 and listens for players
@@ -88,48 +118,30 @@ public class GameModel implements ActionListener {
                     chatArea.append("[SYSTEM] Connecting to server...\n");
                     thePanel.choosingNetworkRole = false;
                 }
-            } else if (evt.getSource() == helpButton) {
-                thePanel.intGameState = 2;
-            } else if (evt.getSource() == creditsButton) {
-                thePanel.intGameState = 3;
-            }
-        }
-
-        // if on lobby screen
-        if (thePanel.intGameState == 1) {
-            if (evt.getSource() == backButton) {
-                thePanel.intGameState = 0;
-            } else if (evt.getSource() == alpineTundraMapButton) {
-                intMapChoice = 0;
-                loadMap(mapFiles[intMapChoice]);
-            } else if (evt.getSource() == oasisDesertMapButton) {
-                intMapChoice = 1;
-                loadMap(mapFiles[intMapChoice]);
-            } else if (evt.getSource() == floatingIslandMapButton) {
-                intMapChoice = 2;
-                loadMap(mapFiles[intMapChoice]);
-            } else if (evt.getSource() == playButton) {
-                thePanel.intGameState = 4;
-            } else if (evt.getSource() == chooseHostButton) {
-                chooseRole = 0;
-            } else if (evt.getSource() == chooseJoinButton) {
-                chooseRole = 1;
-            } else if (evt.getSource() == confirmRoleButton) {
-                thePanel.choosingNetworkRole = false;
             } else if (evt.getSource() == easyButton) {
                 intGameDifficulty = 1;
+                intGameSpeed = 3;
+                chatArea.append("[SYSTEM] Game Difficulty set to: EASY (Speed: Slow)\n");
             } else if (evt.getSource() == mediumButton) {
                 intGameDifficulty = 2;
+                intGameSpeed = 5;
+                chatArea.append("[SYSTEM] Game Difficulty set to: MEDIUM (Speed: Normal)\n");
             } else if (evt.getSource() == hardButton) {
                 intGameDifficulty = 3;
+                intGameSpeed = 7;
+                chatArea.append("[SYSTEM] Game Difficulty set to: HARD (Speed: Fast!)\n");
             } else if (evt.getSource() == redButton) {
-                intPlayerColour = 1;
+                strPlayerColour = "Red";
+                chatArea.append("[LOBBY] Player color set to: RED\n");
             } else if (evt.getSource() == blueButton) {
-                intPlayerColour = 2;
+                strPlayerColour = "Blue";
+                chatArea.append("[LOBBY] Player color set to: BLUE\n");
             } else if (evt.getSource() == greenButton) {
-                intPlayerColour = 3;
+                strPlayerColour = "Green";
+                chatArea.append("[LOBBY] Player color set to: GREEN\n");
             } else if (evt.getSource() == purpleButton) {
-                intPlayerColour = 4;
+                strPlayerColour = "Purple";
+                chatArea.append("[LOBBY] Player color set to: PURPLE\n");
             }
 
             // Bold Map if Chosen
