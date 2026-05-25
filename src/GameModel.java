@@ -112,41 +112,46 @@ public class GameModel implements ActionListener {
                 thePanel.choosingNetworkRole = false;
 
                 if (chooseRole == 0) {
-                    // HOST MODE: Opens port 1337 and listens for players
+                    // HOST MODE
                     isServer = true;
                     ssm = new SuperSocketMaster(1337, this);
                     ssm.connect();
+                    
                     String myRealIP = ssm.getMyAddress();
-                    joiningIPInfo.setText("Hosting! Tell Guest to type IP: " + myRealIP);
+                    joiningIPInfo.setText("Hosting! Tell Guest IP: " + myRealIP);
                     chatArea.append("[SYSTEM] Server started! Waiting for players...\n");
 
-                    // add in player
-                    intPlayersConnected += 1;
-                    int randomX = (int) Math.random() * 1280 + 1;
-                    int randomY = (int) Math.random() * 720 + 1;
+                    // Add in host player
+                    intPlayersConnected = 1;
+                    int randomX = (int)(Math.random() * 1280) + 1; 
+                    int randomY = (int)(Math.random() * 720) + 1;
+                    
                     playerList.add(new Player(intPlayersConnected, randomX, randomY, strPlayerColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
 
-                    thePanel.choosingNetworkRole = false;
-
                 } else if (chooseRole == 1) {
-                    // JOIN MODE: Connects to the host (localhost for testing)
+                    // JOIN MODE
                     isServer = false;
+                    strIPAddress = enterIPAddress.getText();
+
+                    if (strIPAddress == null || strIPAddress.trim().equals("")) {
+                        strIPAddress = "127.0.0.1";
+                    }
+
                     ssm = new SuperSocketMaster(strIPAddress, 1337, this);
                     ssm.connect();
-                    strIPAddress = enterIPAddress.getText();
-                    chatArea.append("[SYSTEM] Connecting to server...\n");
+                    chatArea.append("[SYSTEM] Connected to server...\n");
 
-                    // add in player
-                    intPlayersConnected += 1;
-                    int randomX = (int) Math.random() * 1280 + 1;
-                    int randomY = (int) Math.random() * 720 + 1;
+                    // Add in joiner player 
+                    intPlayersConnected = 2;
+                    int randomX = (int)(Math.random() * 1280) + 1;
+                    int randomY = (int)(Math.random() * 720) + 1;
+                    
                     playerList.add(new Player(intPlayersConnected, randomX, randomY, strPlayerColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
 
                     ssm.sendText("hello," + strPlayerColour);
                 }
-
             } else if (evt.getSource() == easyButton) {
                 intGameDifficulty = 1;
                 intGameSpeed = 3;
@@ -339,7 +344,7 @@ public class GameModel implements ActionListener {
         enterIPAddress.addActionListener(this);
         thePanel.add(enterIPAddress);
 
-        joiningIPInfo.setBounds(600, 400, 200, 50);
+        joiningIPInfo.setBounds(600, 400, 500, 50);
         thePanel.add(joiningIPInfo);
         
         choosePlayerColourLabel.setBounds(420, 400, 400, 50);
@@ -415,6 +420,7 @@ public class GameModel implements ActionListener {
         confirmRoleButton.setVisible(isLobby & thePanel.choosingNetworkRole);
 
         // real lobby
+        joiningIPInfo.setVisible(isLobby && !thePanel.choosingNetworkRole && chooseRole == 0);
         playersConnectedLabel.setVisible(isLobby && !thePanel.choosingNetworkRole);
         chooseMapLabel.setVisible(isLobby && !thePanel.choosingNetworkRole);
         alpineTundraMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole);
