@@ -13,6 +13,7 @@ public class GameView extends JPanel {
     int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
     int[][] tileHealth = new int[9][16]; // 0=full, 1=slightly cracked, 2=cracked, 3=air
 
+    // load tile images
     BufferedImage imgSnowFull = null;
     BufferedImage imgSnowSlightlyCracked = null;
     BufferedImage imgSnowCracked = null;
@@ -32,6 +33,12 @@ public class GameView extends JPanel {
     BufferedImage imgSandFull = null;
     BufferedImage imgSandSlightlyCracked = null;
     BufferedImage imgSandCracked = null;
+
+    // load player images
+    BufferedImage imgPlayerRed = null;
+    BufferedImage imgPlayerBlue = null;
+    BufferedImage imgPlayerGreen = null;
+    BufferedImage imgPlayerPurple = null;
 
     boolean choosingNetworkRole = false;
 
@@ -109,7 +116,8 @@ public class GameView extends JPanel {
     // Constructor
     public GameView(){
         super();
-
+        
+        // load image tiles
         imgSnowFull = loadImage(".media/fullSnowTile.png");
         imgSnowSlightlyCracked = loadImage(".media/slightlyCrackedSnowTile.png");
         imgSnowCracked = loadImage(".media/crackedSnowTile.png");
@@ -129,6 +137,12 @@ public class GameView extends JPanel {
         imgSandFull = loadImage(".media/fullSandTile.png");
         imgSandSlightlyCracked = loadImage(".media/slightlyCrackedSandTile.png");
         imgSandCracked = loadImage(".media/crackedSandTile.png");
+
+        // load player images
+        imgPlayerRed = loadImage(".media/playerRed.png");
+        imgPlayerBlue = loadImage(".media/playerBlue.png");
+        imgPlayerGreen = loadImage(".media/playerGreen.png");
+        imgPlayerPurple = loadImage(".media/playerPurple.png");
 
     }  
     

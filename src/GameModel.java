@@ -3,7 +3,6 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
-// import java.util.HashMap;
 // import javax.swing.event.*;
 
 public class GameModel implements ActionListener {
@@ -39,6 +38,7 @@ public class GameModel implements ActionListener {
     int intGameSpeed = 5;
     int intGameDifficulty = 2; // 1=easy, 2=medium, 3=hard
     String strPlayerColour;
+    String strIPAddress;
 
     // Connecting Pop-up
     JLabel chooseRoleLabel = new JLabel("Choose your network role: ");
@@ -47,6 +47,8 @@ public class GameModel implements ActionListener {
     JButton confirmRoleButton = new JButton("Confirm");
 
     // Host-Specific Difficulty Selectors
+    JLabel enterIPAddressLabel = new JLabel("Enter IP Address: ");
+    JTextField enterIPAddress = new JTextField();
     JLabel chooseDifficultyLabel = new JLabel("Choose game difficulty: ");
     JButton easyButton = new JButton("Easy");
     JButton mediumButton = new JButton("Medium");
@@ -106,7 +108,6 @@ public class GameModel implements ActionListener {
             } else if (evt.getSource() == chooseJoinButton) {
                 chooseRole = 1;
             } else if (evt.getSource() == confirmRoleButton) {
-                thePanel.choosingNetworkRole = false;
 
                 if (chooseRole == 0) {
                     // HOST MODE: Opens port 1337 and listens for players
@@ -115,10 +116,20 @@ public class GameModel implements ActionListener {
                     ssm.connect();
                     chatArea.append("[SYSTEM] Server started! Waiting for players...\n");
                     thePanel.choosingNetworkRole = false;
+
+                    // add in player
+                    intPlayersConnected += 1;
+                    int randomX = (int) Math.random() * 1280 + 1;
+                    int randomY = (int) Math.random() * 720 + 1;
+                    playerList.add(new Player(intPlayersConnected, randomX, randomY, strPlayerColour));
+                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+
+                    thePanel.choosingNetworkRole = false;
+
                 } else if (chooseRole == 1) {
                     // JOIN MODE: Connects to the host (localhost for testing)
                     isServer = false;
-                    ssm = new SuperSocketMaster("127.0.0.1", 1337, this);
+                    ssm = new SuperSocketMaster(strIPAddress, 1337, this);
                     ssm.connect();
                     chatArea.append("[SYSTEM] Connecting to server...\n");
 
@@ -156,6 +167,8 @@ public class GameModel implements ActionListener {
             } else if (evt.getSource() == purpleButton) {
                 strPlayerColour = "Purple";
                 chatArea.append("[LOBBY] Player color set to: PURPLE\n");
+            } else if (evt.getSource() == enterIPAddress) {
+                strIPAddress = enterIPAddress.getText();
             }
 
             // Bold Map if Chosen
@@ -294,6 +307,13 @@ public class GameModel implements ActionListener {
         thePanel.add(chooseJoinButton);
 
         // Host Specific Options
+        enterIPAddressLabel.setBounds(420, 300, 400, 50);
+        thePanel.add(enterIPAddressLabel);
+
+        enterIPAddress.setBounds(425, 350, 400, 50);
+        enterIPAddress.addActionListener(this);
+        thePanel.add(enterIPAddress);
+
         chooseDifficultyLabel.setBounds(420, 400, 400, 50);
         thePanel.add(chooseDifficultyLabel);
 
@@ -364,6 +384,8 @@ public class GameModel implements ActionListener {
         chooseJoinButton.setVisible(isLobby && thePanel.choosingNetworkRole);
 
         // chose host
+        enterIPAddressLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
+        enterIPAddress.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
         chooseDifficultyLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
         easyButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
         mediumButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
