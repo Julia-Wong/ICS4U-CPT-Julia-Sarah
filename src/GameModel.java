@@ -47,14 +47,15 @@ public class GameModel implements ActionListener {
     JButton confirmRoleButton = new JButton("Confirm");
 
     // Host-Specific Difficulty Selectors
-    JLabel enterIPAddressLabel = new JLabel("Enter IP Address: ");
-    JTextField enterIPAddress = new JTextField();
     JLabel chooseDifficultyLabel = new JLabel("Choose game difficulty: ");
     JButton easyButton = new JButton("Easy");
     JButton mediumButton = new JButton("Medium");
     JButton hardButton = new JButton("Hard");
 
     // Joiner-Specific Color Selectors
+    JLabel enterIPAddressLabel = new JLabel("Enter Host's IP Address: ");
+    JTextField enterIPAddress = new JTextField();
+    JLabel joiningIPInfo = new JLabel();
     JLabel choosePlayerColourLabel = new JLabel("Choose player colour: ");
     JButton redButton = new JButton("Red");
     JButton blueButton = new JButton("Blue");
@@ -64,7 +65,7 @@ public class GameModel implements ActionListener {
     // Data
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
     int intMapChoice = -1;
-    int intPlayersConnected = 0;
+    int intPlayersConnected = 1;
     ArrayList<Player> playerList = new ArrayList<Player>();
 
     // Methods
@@ -108,14 +109,16 @@ public class GameModel implements ActionListener {
             } else if (evt.getSource() == chooseJoinButton) {
                 chooseRole = 1;
             } else if (evt.getSource() == confirmRoleButton) {
+                thePanel.choosingNetworkRole = false;
 
                 if (chooseRole == 0) {
                     // HOST MODE: Opens port 1337 and listens for players
                     isServer = true;
                     ssm = new SuperSocketMaster(1337, this);
                     ssm.connect();
+                    String myRealIP = ssm.getMyAddress();
+                    joiningIPInfo.setText("Hosting! Tell Guest to type IP: " + myRealIP);
                     chatArea.append("[SYSTEM] Server started! Waiting for players...\n");
-                    thePanel.choosingNetworkRole = false;
 
                     // add in player
                     intPlayersConnected += 1;
@@ -131,6 +134,7 @@ public class GameModel implements ActionListener {
                     isServer = false;
                     ssm = new SuperSocketMaster(strIPAddress, 1337, this);
                     ssm.connect();
+                    strIPAddress = enterIPAddress.getText();
                     chatArea.append("[SYSTEM] Connecting to server...\n");
 
                     // add in player
@@ -140,7 +144,7 @@ public class GameModel implements ActionListener {
                     playerList.add(new Player(intPlayersConnected, randomX, randomY, strPlayerColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
 
-                    thePanel.choosingNetworkRole = false;
+                    ssm.sendText("hello," + strPlayerColour);
                 }
 
             } else if (evt.getSource() == easyButton) {
@@ -169,6 +173,9 @@ public class GameModel implements ActionListener {
                 chatArea.append("[LOBBY] Player color set to: PURPLE\n");
             } else if (evt.getSource() == enterIPAddress) {
                 strIPAddress = enterIPAddress.getText();
+            } else if (evt.getSource() == ssm) {
+                String strLine = ssm.readText();
+                chatArea.append(strLine + "\n");
             }
 
             // Bold Map if Chosen
@@ -307,12 +314,7 @@ public class GameModel implements ActionListener {
         thePanel.add(chooseJoinButton);
 
         // Host Specific Options
-        enterIPAddressLabel.setBounds(420, 300, 400, 50);
-        thePanel.add(enterIPAddressLabel);
-
-        enterIPAddress.setBounds(425, 350, 400, 50);
-        enterIPAddress.addActionListener(this);
-        thePanel.add(enterIPAddress);
+        
 
         chooseDifficultyLabel.setBounds(420, 400, 400, 50);
         thePanel.add(chooseDifficultyLabel);
@@ -330,6 +332,16 @@ public class GameModel implements ActionListener {
         thePanel.add(hardButton);
 
         // Player Specific Optoins
+        enterIPAddressLabel.setBounds(420, 300, 400, 50);
+        thePanel.add(enterIPAddressLabel);
+
+        enterIPAddress.setBounds(425, 350, 400, 50);
+        enterIPAddress.addActionListener(this);
+        thePanel.add(enterIPAddress);
+
+        joiningIPInfo.setBounds(600, 400, 200, 50);
+        thePanel.add(joiningIPInfo);
+        
         choosePlayerColourLabel.setBounds(420, 400, 400, 50);
         thePanel.add(choosePlayerColourLabel);
 
@@ -384,14 +396,15 @@ public class GameModel implements ActionListener {
         chooseJoinButton.setVisible(isLobby && thePanel.choosingNetworkRole);
 
         // chose host
-        enterIPAddressLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
-        enterIPAddress.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
         chooseDifficultyLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
         easyButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
         mediumButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
         hardButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
 
         // chose player
+        enterIPAddressLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
+        enterIPAddress.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
+
         choosePlayerColourLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
         redButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
         blueButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
