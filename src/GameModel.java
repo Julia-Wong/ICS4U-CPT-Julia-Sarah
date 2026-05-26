@@ -94,16 +94,28 @@ public class GameModel implements ActionListener {
                 intMapChoice = 0;
                 loadMap(mapFiles[intMapChoice]);
                 chatArea.append("[LOBBY] Map chosen: ALPINE TUNDRA\n");
+                if (isServer) {
+                    ssm.sendText("map,0");
+                }
             } else if (evt.getSource() == oasisDesertMapButton) {
                 intMapChoice = 1;
                 loadMap(mapFiles[intMapChoice]);
                 chatArea.append("[LOBBY] Map chosen: OASIS DESERT\n");
+                if (isServer) {
+                    ssm.sendText("map,1");
+                }
             } else if (evt.getSource() == floatingIslandMapButton) {
                 intMapChoice = 2;
                 loadMap(mapFiles[intMapChoice]);
                 chatArea.append("[LOBBY] Map chosen: FLOATING ISLAND\n");
+                if (isServer) {
+                    ssm.sendText("map,2");
+                }
             } else if (evt.getSource() == playButton) {
                 thePanel.intGameState = 4;
+                if (isServer) {
+                    ssm.sendText("start");
+                }
             } else if (evt.getSource() == chooseHostButton) {
                 chooseRole = 0;
             } else if (evt.getSource() == chooseJoinButton) {
@@ -178,9 +190,42 @@ public class GameModel implements ActionListener {
                 chatArea.append("[LOBBY] Player color set to: PURPLE\n");
             } else if (evt.getSource() == enterIPAddress) {
                 strIPAddress = enterIPAddress.getText();
-            } else if (evt.getSource() == ssm) {
-                String strLine = ssm.readText();
-                chatArea.append(strLine + "\n");
+            } else if (evt.getSource() == ssm && ssm != null) {
+                // String strLine = ssm.readText();
+                // chatArea.append(strLine + "\n");
+
+                String incomingMessage = ssm.readText();
+                String[] message = incomingMessage.split(",");
+                String word = message[0];
+
+                if (word.equals("hello")) {
+                    intPlayersConnected += 1;
+                    String guestColour = message[1];
+
+                    playerList.add(new Player(intPlayersConnected, 600, 300, guestColour));
+                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+                    chatArea.append("[SYSTEM] Guest joined as " + guestColour + "!\n");
+                    
+                    if (isServer) {
+                        ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour);
+                    }
+                } else if (word.equals("hostInfo")) {
+                    intPlayersConnected = Integer.parseInt(message[1]);
+                    String hostColour = message[2];
+
+                    playerList.add(new Player(1, 400, 300, hostColour));
+                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+                } else if (word.equals("map")) {
+                    intMapChoice = Integer.parseInt(message[1]);
+                    loadMap(mapFiles[intMapChoice]);
+                    chatArea.append("[SYSTEM] Host changed map to option " + intMapChoice + "\n");
+                } else if (word.equals("start")) {
+                    thePanel.intGameState = 4;
+                    chatArea.append("[SYSTEM] Game starting!\n");
+                }
+                showCurrentGUI();
+                return;
+
             }
 
             // Bold Map if Chosen
@@ -425,14 +470,14 @@ public class GameModel implements ActionListener {
         // real lobby
         joiningIPInfo.setVisible(isLobby && !thePanel.choosingNetworkRole && chooseRole == 0);
         playersConnectedLabel.setVisible(isLobby && !thePanel.choosingNetworkRole);
-        chooseMapLabel.setVisible(isLobby && !thePanel.choosingNetworkRole);
-        alpineTundraMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole);
-        oasisDesertMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole);
-        floatingIslandMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole);
-        playButton.setVisible(isLobby && !thePanel.choosingNetworkRole);
         scrollChatArea.setVisible(isLobby && !thePanel.choosingNetworkRole);
         chatInput.setVisible(isLobby && !thePanel.choosingNetworkRole);
 
+        chooseMapLabel.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
+        alpineTundraMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
+        oasisDesertMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
+        floatingIslandMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
+        playButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
         
 
         // if on help screen:
