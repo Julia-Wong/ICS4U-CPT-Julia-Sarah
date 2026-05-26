@@ -65,7 +65,7 @@ public class GameModel implements ActionListener {
     // Data
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
     int intMapChoice = -1;
-    int intPlayersConnected = 1;
+    int intPlayersConnected = 0;
     ArrayList<Player> playerList = new ArrayList<Player>();
 
     // Methods
@@ -86,7 +86,7 @@ public class GameModel implements ActionListener {
         // if on lobby screen
         if (thePanel.intGameState == 1) {
             if (evt.getSource() == backButton) {
-                if (thePanel.intGameState == 1 && !thePanel.choosingNetworkRole && chooseRole == 1) {
+                if (thePanel.intGameState == 1 && !thePanel.choosingNetworkRole && chooseRole != -1) {
                     intPlayersConnected -= 1;
                 }
                 thePanel.intGameState = 0;
@@ -122,7 +122,7 @@ public class GameModel implements ActionListener {
                     chatArea.append("[SYSTEM] Server started! Waiting for players...\n");
 
                     // Add in host player
-                    intPlayersConnected = 1;
+                    intPlayersConnected += 1;
                     int randomX = (int)(Math.random() * 1280) + 1; 
                     int randomY = (int)(Math.random() * 720) + 1;
                     
@@ -143,7 +143,7 @@ public class GameModel implements ActionListener {
                     chatArea.append("[SYSTEM] Connected to server...\n");
 
                     // Add in joiner player 
-                    intPlayersConnected = 2;
+                    intPlayersConnected += 1;
                     int randomX = (int)(Math.random() * 1280) + 1;
                     int randomY = (int)(Math.random() * 720) + 1;
                     
@@ -321,18 +321,18 @@ public class GameModel implements ActionListener {
         // Host Specific Options
         
 
-        chooseDifficultyLabel.setBounds(420, 400, 400, 50);
+        chooseDifficultyLabel.setBounds(420, 500, 400, 50);
         thePanel.add(chooseDifficultyLabel);
 
-        easyButton.setBounds(350, 450, 100, 100);
+        easyButton.setBounds(350, 550, 100, 100);
         easyButton.addActionListener(this);
         thePanel.add(easyButton);
 
-        mediumButton.setBounds(450, 450, 100, 100);
+        mediumButton.setBounds(450, 550, 100, 100);
         mediumButton.addActionListener(this);
         thePanel.add(mediumButton);
 
-        hardButton.setBounds(550, 450, 100, 100);
+        hardButton.setBounds(550, 550, 100, 100);
         hardButton.addActionListener(this);
         thePanel.add(hardButton);
 
@@ -385,6 +385,9 @@ public class GameModel implements ActionListener {
         boolean isHelp = thePanel.intGameState == 2;
         boolean isCredits = thePanel.intGameState == 3;
 
+        thePanel.currentPlayers = this.playerList;
+        thePanel.repaint();
+
         // draw shared J Components
         backButton.setVisible(isLobby || isHelp || isCredits);
         titleSpleef.setVisible(isHome || isLobby);
@@ -410,11 +413,11 @@ public class GameModel implements ActionListener {
         enterIPAddressLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
         enterIPAddress.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
 
-        choosePlayerColourLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
-        redButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
-        blueButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
-        greenButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
-        purpleButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
+        choosePlayerColourLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
+        redButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
+        blueButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
+        greenButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
+        purpleButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
 
         // confirm
         confirmRoleButton.setVisible(isLobby & thePanel.choosingNetworkRole);

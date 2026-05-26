@@ -5,6 +5,7 @@ import java.awt.image.*;
 import java.io.*;
 // import javax.swing.event.*;
 import javax.imageio.*;
+import java.util.ArrayList;
 
 
 public class GameView extends JPanel { 
@@ -12,6 +13,7 @@ public class GameView extends JPanel {
     int intGameState = 0; // 0=home, 1=lobby, 2=help, 3=credits, 4=play, 5=gameover
     int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
     int[][] tileHealth = new int[9][16]; // 0=full, 1=slightly cracked, 2=cracked, 3=air
+    ArrayList<Player> currentPlayers = new ArrayList<Player>();
 
     // load tile images
     BufferedImage imgSnowFull = null;
@@ -49,7 +51,21 @@ public class GameView extends JPanel {
         if (intGameState == 0) {
             
         } else if (intGameState == 1) {
-
+            if (choosingNetworkRole == false && currentPlayers != null) {
+                for (Player p: currentPlayers) {
+                    if (p.strColour != null) {
+                        if (p.strColour.equals("Red")) {
+                            g.drawImage(imgPlayerRed, 300, 300, null);
+                        } else if (p.strColour.equals("Blue")) {
+                            g.drawImage(imgPlayerBlue, 400, 300, null);
+                        } else if (p.strColour.equals("Green")) {
+                            g.drawImage(imgPlayerGreen, 500, 300, null);
+                        } else if (p.strColour.equals("Purple")) {
+                            g.drawImage(imgPlayerPurple, 600, 300, null);
+                        } 
+                    }
+                }
+            }
         } else if (intGameState == 2) {
 
         } else if (intGameState == 3) {
@@ -58,6 +74,7 @@ public class GameView extends JPanel {
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, 1280, 720);
 
+            // draw map
             for (int r = 0; r < map.length; r++) {
                 for (int c = 0; c < map[r].length; c++) {
 
