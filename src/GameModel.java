@@ -443,18 +443,23 @@ public class GameModel implements ActionListener {
         thePanel.add(choosePlayerColourLabel);
 
         redButton.setBounds(350, 450, 100, 100);
+        // redButton.setBackground(Color.RED);
         redButton.addActionListener(this);
         thePanel.add(redButton);
 
         blueButton.setBounds(450, 450, 100, 100);
+        // blueButton.setForeground(Color.WHITE);
+        // blueButton.setBackground(Color.BLUE);
         blueButton.addActionListener(this);
         thePanel.add(blueButton);
 
         greenButton.setBounds(550, 450, 100, 100);
+        // greenButton.setBackground(Color.GREEN);
         greenButton.addActionListener(this);
         thePanel.add(greenButton);
 
         purpleButton.setBounds(650, 450, 100, 100);
+        // purpleButton.setBackground(Color.MAGENTA);
         purpleButton.addActionListener(this);
         thePanel.add(purpleButton);
 
