@@ -17,13 +17,13 @@ public class GameModel implements ActionListener {
     JButton creditsButton = new JButton("Credits");
 
     // Back Buttons
-    JButton backButton = new JButton("<- Back");
+    JButton backButton = new JButton("← Back");
 
     // Lobby Buttons
     JLabel playersConnectedLabel = new JLabel();
     JLabel chooseMapLabel = new JLabel("Choose a Map: ");
-    JButton alpineTundraMapButton = new JButton("Alpine Tundra Map"); // snow stone dirt
-    JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand stone dirt
+    JButton alpineTundraMapButton = new JButton("Alpine Tundra Map"); // snow stone 
+    JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand dirt
     JButton floatingIslandMapButton = new JButton("Floating Island Map"); // grass dirt sand
     JButton playButton = new JButton("PLAY");
 
@@ -121,6 +121,16 @@ public class GameModel implements ActionListener {
             } else if (evt.getSource() == chooseJoinButton) {
                 chooseRole = 1;
             } else if (evt.getSource() == confirmRoleButton) {
+                if (chooseRole == -1) {
+                    chatArea.append("[SYSTEM] Please select a Host or Join before confirming.\n");
+                    return;
+                }
+                
+                if(strPlayerColour == null) {
+                    chatArea.append("[SYSTEM] Please select a player colour before confirming.\n");
+                    return;
+                }
+
                 thePanel.choosingNetworkRole = false;
 
                 if (chooseRole == 0) {
@@ -151,8 +161,18 @@ public class GameModel implements ActionListener {
                     }
 
                     ssm = new SuperSocketMaster(strIPAddress, 1337, this);
-                    ssm.connect();
-                    chatArea.append("[SYSTEM] Connected to server...\n");
+                    boolean connected = ssm.connect();
+
+                    // If connected sucessfully
+                    if (connected == true){
+                        chatArea.append("[SYSTEM] Connected to server...\n");
+                        ssm.sendText("Hello, " + strPlayerColour);
+                    // If failed to connect
+                    } else {
+                        chatArea.append("[SYSTEM] Failed to connect to server. Please check the IP address and try again.\n");
+                        ssm = null;
+                        thePanel.choosingNetworkRole = true;
+                    }
 
                     // Add in joiner player 
                     intPlayersConnected += 1;
@@ -190,6 +210,17 @@ public class GameModel implements ActionListener {
                 chatArea.append("[LOBBY] Player color set to: PURPLE\n");
             } else if (evt.getSource() == enterIPAddress) {
                 strIPAddress = enterIPAddress.getText();
+            } else if (evt.getSource() == chatInput){
+                // Chat Messages
+                String chatMessage = chatInput.getText();
+
+                if (chatMessage != null && !chatMessage.trim().equals("")) {
+                    chatArea.append("[YOU] " + chatMessage + "\n");
+                    if (ssm != null) {
+                        ssm.sendText("chat," + strPlayerColour + "," + chatMessage);
+                    }
+                    chatInput.setText("");
+                }
             } else if (evt.getSource() == ssm && ssm != null) {
                 // String strLine = ssm.readText();
                 // chatArea.append(strLine + "\n");
@@ -222,6 +253,10 @@ public class GameModel implements ActionListener {
                 } else if (word.equals("start")) {
                     thePanel.intGameState = 4;
                     chatArea.append("[SYSTEM] Game starting!\n");
+                } else if (word.equals("chat")) {
+                    String senderColour = message[1];
+                    String senderMessage = message[2];
+                    chatArea.append("[" + senderColour + "] " + senderMessage + "\n");
                 }
                 showCurrentGUI();
                 return;
@@ -264,8 +299,7 @@ public class GameModel implements ActionListener {
         }
 
         showCurrentGUI();
-        
-    }
+    }   
 
     public void loadMap(String fileName) {
         BufferedReader mapFile = null;
