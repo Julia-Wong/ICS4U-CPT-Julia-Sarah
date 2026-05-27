@@ -166,7 +166,16 @@ public class GameModel implements ActionListener {
                     // If connected sucessfully
                     if (connected == true){
                         chatArea.append("[SYSTEM] Connected to server...\n");
-                        ssm.sendText("Hello, " + strPlayerColour);
+                        
+                         // Add in joiner player 
+                        intPlayersConnected += 1;
+                        int randomX = (int)(Math.random() * 1280) + 1;
+                        int randomY = (int)(Math.random() * 720) + 1;
+                        
+                        playerList.add(new Player(intPlayersConnected, randomX, randomY, strPlayerColour));
+                        playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+
+                        ssm.sendText("hello," + strPlayerColour);
                     // If failed to connect
                     } else {
                         chatArea.append("[SYSTEM] Failed to connect to server. Please check the IP address and try again.\n");
@@ -174,15 +183,7 @@ public class GameModel implements ActionListener {
                         thePanel.choosingNetworkRole = true;
                     }
 
-                    // Add in joiner player 
-                    intPlayersConnected += 1;
-                    int randomX = (int)(Math.random() * 1280) + 1;
-                    int randomY = (int)(Math.random() * 720) + 1;
-                    
-                    playerList.add(new Player(intPlayersConnected, randomX, randomY, strPlayerColour));
-                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
-
-                    ssm.sendText("hello," + strPlayerColour);
+                   
                 }
             } else if (evt.getSource() == easyButton) {
                 intGameDifficulty = 1;
@@ -215,18 +216,19 @@ public class GameModel implements ActionListener {
                 String chatMessage = chatInput.getText();
 
                 if (chatMessage != null && !chatMessage.trim().equals("")) {
-                    chatArea.append("[YOU] " + chatMessage + "\n");
                     if (ssm != null) {
+                        chatArea.append("[YOU] " + chatMessage + "\n");
                         ssm.sendText("chat," + strPlayerColour + "," + chatMessage);
+                        chatInput.setText("");
+                    } else {
+                        chatArea.append("[SYSTEM] You are not connected yet! Please connect first.\n");
                     }
-                    chatInput.setText("");
+                   
                 }
             } else if (evt.getSource() == ssm && ssm != null) {
-                // String strLine = ssm.readText();
-                // chatArea.append(strLine + "\n");
-
+                // Read and separate incoming messages
                 String incomingMessage = ssm.readText();
-                String[] message = incomingMessage.split(",");
+                String[] message = incomingMessage.split(",", 3);
                 String word = message[0];
 
                 if (word.equals("hello")) {
@@ -254,9 +256,9 @@ public class GameModel implements ActionListener {
                     thePanel.intGameState = 4;
                     chatArea.append("[SYSTEM] Game starting!\n");
                 } else if (word.equals("chat")) {
-                    String senderColour = message[1];
-                    String senderMessage = message[2];
-                    chatArea.append("[" + senderColour + "] " + senderMessage + "\n");
+                    if (message.length >= 3) {
+                        chatArea.append("[" + message[1] + "] " + message[2] + "\n");
+                    }
                 }
                 showCurrentGUI();
                 return;
