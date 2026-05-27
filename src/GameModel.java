@@ -128,7 +128,7 @@ public class GameModel implements ActionListener {
                     return;
                 }
                 
-                if(strPlayerColour == null) {
+                if (strPlayerColour == null) {
                     chatArea.append("[SYSTEM] Please select a player colour before confirming.\n");
                     return;
                 }
@@ -147,10 +147,10 @@ public class GameModel implements ActionListener {
 
                     // Add in host player
                     intPlayersConnected += 1;
-                    int randomX = (int)(Math.random() * 1280) + 1; 
-                    int randomY = (int)(Math.random() * 720) + 1;
+                    //int randomX = (int)(Math.random() * 1280) + 1; 
+                    //int randomY = (int)(Math.random() * 720) + 1;
                     
-                    playerList.add(new Player(intPlayersConnected, randomX, randomY, strPlayerColour));
+                    playerList.add(new Player(intPlayersConnected, 6*80, 2*80, strPlayerColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
 
                 } else if (chooseRole == 1) {
@@ -171,10 +171,18 @@ public class GameModel implements ActionListener {
                         
                          // Add in joiner player 
                         intPlayersConnected += 1;
-                        int randomX = (int)(Math.random() * 1280) + 1;
-                        int randomY = (int)(Math.random() * 720) + 1;
+
+                        if (intPlayersConnected == 2) {
+                            // Spawn in bottom right
+                            playerList.add(new Player(intPlayersConnected, 9*80, 6*80, strPlayerColour));
+                        } else if (intPlayersConnected == 3) {
+                            // Spawn in bottom left
+                            playerList.add(new Player(intPlayersConnected, 6*80, 6*80, strPlayerColour));
+                        } else if (intPlayersConnected == 4) {
+                            // Spawn in top right
+                            playerList.add(new Player(intPlayersConnected, 9*80, 2*80, strPlayerColour));
+                        }
                         
-                        playerList.add(new Player(intPlayersConnected, randomX, randomY, strPlayerColour));
                         playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
 
                         ssm.sendText("hello," + strPlayerColour);
@@ -184,8 +192,6 @@ public class GameModel implements ActionListener {
                         ssm = null;
                         thePanel.choosingNetworkRole = true;
                     }
-
-                   
                 }
             } else if (evt.getSource() == easyButton) {
                 intGameDifficulty = 1;
@@ -411,8 +417,6 @@ public class GameModel implements ActionListener {
         thePanel.add(chooseJoinButton);
 
         // Host Specific Options
-        
-
         chooseDifficultyLabel.setBounds(420, 500, 400, 50);
         thePanel.add(chooseDifficultyLabel);
 
