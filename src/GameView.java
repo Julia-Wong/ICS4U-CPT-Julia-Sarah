@@ -122,6 +122,31 @@ public class GameView extends JPanel {
 
                 }
             }
+        
+            // draw players
+            for (Player p: currentPlayers) {
+                if (p.isAlive) {
+                    BufferedImage spriteToDraw = null;
+                    // match colour to img character
+                    if (p.strColour != null) {
+                        if (p.strColour.equals("Red")) {
+                            spriteToDraw = imgPlayerRed;
+                        } else if (p.strColour.equals("Blue")) {
+                            spriteToDraw = imgPlayerBlue;
+                        } else if (p.strColour.equals("Green")) {
+                            spriteToDraw = imgPlayerGreen;
+                        } else if (p.strColour.equals("Purple")) {
+                            spriteToDraw = imgPlayerPurple;
+                        }
+                    }
+
+                    // draw players
+                    if (spriteToDraw != null) {
+                        g.drawImage(spriteToDraw, p.intX, p.intY, null);
+                    }
+                }
+            }
+
         } else if (intGameState == 5) {
 
         }

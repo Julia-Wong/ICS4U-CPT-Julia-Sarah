@@ -9,6 +9,7 @@ public class GameModel implements ActionListener {
     // Properties
     JFrame theFrame = new JFrame("Spleef");
     GameView thePanel = new GameView();
+    Timer theTimer = new Timer(1000/60, this);
 
     // Home Screen
     JLabel titleSpleef = new JLabel("Spleef");
@@ -116,6 +117,7 @@ public class GameModel implements ActionListener {
                 if (isServer) {
                     ssm.sendText("start");
                 }
+                theTimer.start();
             } else if (evt.getSource() == chooseHostButton) {
                 chooseRole = 0;
             } else if (evt.getSource() == chooseJoinButton) {
@@ -263,6 +265,15 @@ public class GameModel implements ActionListener {
                 showCurrentGUI();
                 return;
 
+            } else if (evt.getSource() == theTimer) {
+                for (Player p: playerList) {
+                    // move players
+                    
+                    // check collisions
+
+                }
+
+                thePanel.repaint();
             }
 
             // Bold Map if Chosen
