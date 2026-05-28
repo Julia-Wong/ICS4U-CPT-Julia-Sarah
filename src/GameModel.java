@@ -71,6 +71,103 @@ public class GameModel implements ActionListener {
 
     // Methods
     public void actionPerformed(ActionEvent evt) {
+        if (evt.getSource() == ssm && ssm != null) {
+                // Read and separate incoming messages
+                String incomingMessage = ssm.readText();
+                String[] message = incomingMessage.split(",");
+                String word = message[0];
+
+                if (word.equals("hello")) {
+                    intPlayersConnected += 1;
+                    String guestColour = message[1];
+
+                    int intSpawnX = 0;
+                    int intSpawnY = 0;
+
+                    if (intPlayersConnected == 2) {
+                        // Spawn in bottom right
+                        intSpawnX = 9 * 80;
+                        intSpawnY = 6 * 80;
+                    } else if (intPlayersConnected == 3) {
+                        // Spawn in bottom left
+                        intSpawnX = 6 * 80;
+                        intSpawnY = 6 * 80;
+                    } else if (intPlayersConnected == 4) {
+                        // Spawn in top right
+                        intSpawnX = 9 * 80;
+                        intSpawnY = 2 * 80;
+                    }
+
+                    playerList.add(new Player(intPlayersConnected, intSpawnX, intSpawnY, guestColour));
+                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+                    chatArea.append("[SYSTEM] Guest joined as " + guestColour + "!\n");
+                    
+                    if (isServer) {
+                        ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour + "," + intMapChoice);
+                    }
+                } else if (word.equals("hostInfo")) {
+                    intPlayersConnected = Integer.parseInt(message[1]);
+                    String hostColour = message[2];
+                    int hostMap = Integer.parseInt(message[3]);
+
+                    intMapChoice = hostMap;
+                    if (intMapChoice != -1) {
+                        loadMap(mapFiles[intMapChoice]);
+                    }
+
+                    playerList.clear();
+                    playerList.add(new Player(1, 6 * 80, 2 * 80, hostColour));
+
+                    int intHostSpawnX = 0;
+                    int intHostSpawnY = 0;
+
+                    if (intPlayersConnected == 2) {
+                        // Spawn in bottom right
+                        intHostSpawnX = 9 * 80;
+                        intHostSpawnY = 6 * 80;
+                    } else if (intPlayersConnected == 3) {
+                        // Spawn in bottom left
+                        intHostSpawnX = 6 * 80;
+                        intHostSpawnY = 6 * 80;
+                    } else if (intPlayersConnected == 4) {
+                        // Spawn in top right
+                        intHostSpawnX = 9 * 80;
+                        intHostSpawnY = 2 * 80;
+                    }
+                    
+                    playerList.add(new Player(intPlayersConnected, intHostSpawnX, intHostSpawnY, strPlayerColour));
+                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+
+                } else if (word.equals("map")) {
+                    intMapChoice = Integer.parseInt(message[1]);
+                    loadMap(mapFiles[intMapChoice]);
+                    chatArea.append("[SYSTEM] Host changed map to option " + intMapChoice + "\n");
+                } else if (word.equals("start")) {
+                    thePanel.intGameState = 4;
+                    chatArea.append("[SYSTEM] Game starting!\n");
+                    theTimer.start();
+                } else if (word.equals("chat")) {
+                    if (message.length >= 3) {
+                        chatArea.append("[" + message[1] + "] " + message[2] + "\n");
+                    }
+                }
+                showCurrentGUI();
+                return;
+
+            }
+            
+            if (evt.getSource() == theTimer) {
+                for (Player p: playerList) {
+                    // move players
+                    
+                    // check collisions
+
+                }
+
+                thePanel.repaint();
+                return;
+            }
+
         // if on homescreen
         if (thePanel.intGameState == 0) {
             if (evt.getSource() == lobbyButton) {
@@ -218,99 +315,8 @@ public class GameModel implements ActionListener {
                     }
                    
                 }
-            } else if (evt.getSource() == ssm && ssm != null) {
-                // Read and separate incoming messages
-                String incomingMessage = ssm.readText();
-                String[] message = incomingMessage.split(",", 3);
-                String word = message[0];
-
-                if (word.equals("hello")) {
-                    intPlayersConnected += 1;
-                    String guestColour = message[1];
-
-                    int intSpawnX = 0;
-                    int intSpawnY = 0;
-
-                    if (intPlayersConnected == 2) {
-                        // Spawn in bottom right
-                        intSpawnX = 9 * 80;
-                        intSpawnY = 6 * 80;
-                    } else if (intPlayersConnected == 3) {
-                        // Spawn in bottom left
-                        intSpawnX = 6 * 80;
-                        intSpawnY = 6 * 80;
-                    } else if (intPlayersConnected == 4) {
-                        // Spawn in top right
-                        intSpawnX = 9 * 80;
-                        intSpawnY = 2 * 80;
-                    }
-
-                    playerList.add(new Player(intPlayersConnected, intSpawnX, intSpawnY, guestColour));
-                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
-                    chatArea.append("[SYSTEM] Guest joined as " + guestColour + "!\n");
-                    
-                    if (isServer) {
-                        ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour + "," + intMapChoice);
-                    }
-                } else if (word.equals("hostInfo")) {
-                    intPlayersConnected = Integer.parseInt(message[1]);
-                    String hostColour = message[2];
-                    int hostMap = Integer.parseInt(message[3]);
-
-                    intMapChoice = hostMap;
-                    if (intMapChoice != -1) {
-                        loadMap(mapFiles[intMapChoice]);
-                    }
-
-                    playerList.add(new Player(1, 6 * 80, 2 * 80, hostColour));
-
-                    int intHostSpawnX = 0;
-                    int intHostSpawnY = 0;
-
-                    if (intPlayersConnected == 2) {
-                        // Spawn in bottom right
-                        intHostSpawnX = 9 * 80;
-                        intHostSpawnY = 6 * 80;
-                    } else if (intPlayersConnected == 3) {
-                        // Spawn in bottom left
-                        intHostSpawnX = 6 * 80;
-                        intHostSpawnY = 6 * 80;
-                    } else if (intPlayersConnected == 4) {
-                        // Spawn in top right
-                        intHostSpawnX = 9 * 80;
-                        intHostSpawnY = 2 * 80;
-                    }
-                    
-                    playerList.add(new Player(intPlayersConnected, intHostSpawnX, intHostSpawnY, strPlayerColour));
-                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
-
-                } else if (word.equals("map")) {
-                    intMapChoice = Integer.parseInt(message[1]);
-                    loadMap(mapFiles[intMapChoice]);
-                    chatArea.append("[SYSTEM] Host changed map to option " + intMapChoice + "\n");
-                } else if (word.equals("start")) {
-                    thePanel.intGameState = 4;
-                    chatArea.append("[SYSTEM] Game starting!\n");
-                    theTimer.start();
-                } else if (word.equals("chat")) {
-                    if (message.length >= 3) {
-                        chatArea.append("[" + message[1] + "] " + message[2] + "\n");
-                    }
-                }
-                showCurrentGUI();
-                return;
-
-            } else if (evt.getSource() == theTimer) {
-                for (Player p: playerList) {
-                    // move players
-                    
-                    // check collisions
-
-                }
-
-                thePanel.repaint();
-            }
-
+            } 
+            
             // Bold Map if Chosen
             if (intMapChoice == 0) { // Bold Apline Tundra
                 alpineTundraMapButton.setText("★ ALPINE TUNDRA ★");
