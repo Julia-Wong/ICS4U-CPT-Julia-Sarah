@@ -5,6 +5,10 @@ public class Player {
     int intY;
     String strColour;
     boolean isAlive;
+    boolean upPressed;
+    boolean downPressed;
+    boolean leftPressed;
+    boolean rightPressed;
 
     // Methods
 
@@ -15,5 +19,9 @@ public class Player {
         this.intY = intY;
         this.strColour = strColour;
         this.isAlive = true;
+        this.upPressed = false;
+        this.downPressed = false;
+        this.leftPressed = false;
+        this.rightPressed = false;
     }
 }

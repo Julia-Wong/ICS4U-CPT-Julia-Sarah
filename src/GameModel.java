@@ -5,7 +5,7 @@ import java.io.*;
 import java.util.ArrayList;
 // import javax.swing.event.*;
 
-public class GameModel implements ActionListener {
+public class GameModel implements ActionListener, KeyListener {
     // Properties
     JFrame theFrame = new JFrame("Spleef");
     GameView thePanel = new GameView();
@@ -149,6 +149,18 @@ public class GameModel implements ActionListener {
                 } else if (word.equals("chat")) {
                     if (message.length >= 3) {
                         chatArea.append("[" + message[1] + "] " + message[2] + "\n");
+                    }
+                } else if (word.equals("move")) {
+                    String movingPlayerColour = message[1];
+                    int newX = Integer.parseInt(message[2]);
+                    int newY = Integer.parseInt(message[3]);
+
+                    for (Player p: playerList) {
+                        if (p.strColour.equals(movingPlayerColour)) {
+                            p.intX = newX;
+                            p.intY = newY;
+                            break;
+                        }
                     }
                 }
                 showCurrentGUI();
@@ -355,6 +367,68 @@ public class GameModel implements ActionListener {
         showCurrentGUI();
     }   
 
+    public void keyTyped(KeyEvent evt) {
+
+    }
+
+    public void keyPressed(KeyEvent evt) {
+        if (thePanel.intGameState != 4) {
+            return;
+        }
+        int key = evt.getKeyCode();
+
+        Player myPlayer = null;
+        for (Player p: playerList) {
+            if (p.strColour.equals(strPlayerColour)) {
+                myPlayer = p;
+                break;
+            }
+        }
+
+        if (myPlayer == null) {
+            return;
+        }
+
+        if (key == KeyEvent.VK_W) {
+            myPlayer.upPressed = true;
+        } else if (key == KeyEvent.VK_S) {
+            myPlayer.downPressed = true;
+        } else if (key == KeyEvent.VK_A) {
+            myPlayer.leftPressed = true;
+        } else if (key == KeyEvent.VK_D) {
+            myPlayer.rightPressed = true;
+        }
+    }
+
+    public void keyReleased(KeyEvent evt) {
+        if (thePanel.intGameState != 4) {
+            return;
+        }
+        int key = evt.getKeyCode();
+
+        Player myPlayer = null;
+        for (Player p: playerList) {
+            if (p.strColour.equals(strPlayerColour)) {
+                myPlayer = p;
+                break;
+            }
+        }
+
+        if (myPlayer == null) {
+            return;
+        }
+
+        if (key == KeyEvent.VK_W) {
+            myPlayer.upPressed = false;
+        } else if (key == KeyEvent.VK_S) {
+            myPlayer.downPressed = false;
+        } else if (key == KeyEvent.VK_A) {
+            myPlayer.leftPressed = false;
+        } else if (key == KeyEvent.VK_D) {
+            myPlayer.rightPressed = false;
+        }
+    }
+
     public void loadMap(String fileName) {
         BufferedReader mapFile = null;
         try {
@@ -383,6 +457,9 @@ public class GameModel implements ActionListener {
         // Set Panel
         thePanel.setLayout(null);
         thePanel.setPreferredSize(new Dimension(1280, 720));
+
+        // Key Listener
+        thePanel.addKeyListener(this);
 
         // Add Title
         titleSpleef.setBounds(500, 100, 400, 100);
