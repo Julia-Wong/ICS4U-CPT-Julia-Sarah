@@ -118,6 +118,7 @@ public class GameModel implements ActionListener {
                     ssm.sendText("start");
                 }
                 theTimer.start();
+                thePanel.repaint();
             } else if (evt.getSource() == chooseHostButton) {
                 chooseRole = 0;
             } else if (evt.getSource() == chooseJoinButton) {
@@ -150,7 +151,7 @@ public class GameModel implements ActionListener {
                     //int randomX = (int)(Math.random() * 1280) + 1; 
                     //int randomY = (int)(Math.random() * 720) + 1;
                     
-                    playerList.add(new Player(intPlayersConnected, 2 * 80, 2 * 80, strPlayerColour));
+                    playerList.add(new Player(intPlayersConnected, 6 * 80, 2 * 80, strPlayerColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
 
                 } else if (chooseRole == 1) {
@@ -261,7 +262,7 @@ public class GameModel implements ActionListener {
                         loadMap(mapFiles[intMapChoice]);
                     }
 
-                    playerList.add(new Player(1, 4 * 80, 4 * 80, hostColour));
+                    playerList.add(new Player(1, 6 * 80, 2 * 80, hostColour));
 
                     int intHostSpawnX = 0;
                     int intHostSpawnY = 0;
@@ -290,6 +291,7 @@ public class GameModel implements ActionListener {
                 } else if (word.equals("start")) {
                     thePanel.intGameState = 4;
                     chatArea.append("[SYSTEM] Game starting!\n");
+                    theTimer.start();
                 } else if (word.equals("chat")) {
                     if (message.length >= 3) {
                         chatArea.append("[" + message[1] + "] " + message[2] + "\n");

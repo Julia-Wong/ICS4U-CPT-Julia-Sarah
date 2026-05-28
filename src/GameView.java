@@ -48,9 +48,9 @@ public class GameView extends JPanel {
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
-        if (intGameState == 0) {
+        if (intGameState == 0) { // home
             
-        } else if (intGameState == 1) {
+        } else if (intGameState == 1) { // lobby
             if (choosingNetworkRole == false && currentPlayers != null) {
                 for (Player p: currentPlayers) {
                     if (p.strColour != null) {
@@ -66,11 +66,11 @@ public class GameView extends JPanel {
                     }
                 }
             }
-        } else if (intGameState == 2) {
+        } else if (intGameState == 2) { // help
 
-        } else if (intGameState == 3) {
+        } else if (intGameState == 3) { // credits
 
-        } else if (intGameState == 4) {
+        } else if (intGameState == 4) { // play
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, 1280, 720);
 
@@ -147,7 +147,7 @@ public class GameView extends JPanel {
                 }
             }
 
-        } else if (intGameState == 5) {
+        } else if (intGameState == 5) { // end screen
 
         }
 
