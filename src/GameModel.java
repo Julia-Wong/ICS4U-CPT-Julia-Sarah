@@ -168,22 +168,6 @@ public class GameModel implements ActionListener {
                     // If connected sucessfully
                     if (connected == true){
                         chatArea.append("[SYSTEM] Connected to server...\n");
-                        
-                         // Add in joiner player 
-                        intPlayersConnected += 1;
-
-                        if (intPlayersConnected == 2) {
-                            // Spawn in bottom right
-                            playerList.add(new Player(intPlayersConnected, 9*80, 6*80, strPlayerColour));
-                        } else if (intPlayersConnected == 3) {
-                            // Spawn in bottom left
-                            playerList.add(new Player(intPlayersConnected, 6*80, 6*80, strPlayerColour));
-                        } else if (intPlayersConnected == 4) {
-                            // Spawn in top right
-                            playerList.add(new Player(intPlayersConnected, 9*80, 2*80, strPlayerColour));
-                        }
-                        
-                        playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
 
                         ssm.sendText("hello," + strPlayerColour);
                     // If failed to connect
@@ -255,7 +239,20 @@ public class GameModel implements ActionListener {
                     String hostColour = message[2];
 
                     playerList.add(new Player(1, 400, 300, hostColour));
+
+                    if (intPlayersConnected == 2) {
+                        // Spawn in bottom right
+                        playerList.add(new Player(intPlayersConnected, 9*80, 6*80, strPlayerColour));
+                    } else if (intPlayersConnected == 3) {
+                        // Spawn in bottom left
+                        playerList.add(new Player(intPlayersConnected, 6*80, 6*80, strPlayerColour));
+                    } else if (intPlayersConnected == 4) {
+                        // Spawn in top right
+                        playerList.add(new Player(intPlayersConnected, 9*80, 2*80, strPlayerColour));
+                    }
+                    
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+
                 } else if (word.equals("map")) {
                     intMapChoice = Integer.parseInt(message[1]);
                     loadMap(mapFiles[intMapChoice]);
