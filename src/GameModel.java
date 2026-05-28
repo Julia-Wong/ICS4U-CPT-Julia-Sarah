@@ -150,7 +150,7 @@ public class GameModel implements ActionListener {
                     //int randomX = (int)(Math.random() * 1280) + 1; 
                     //int randomY = (int)(Math.random() * 720) + 1;
                     
-                    playerList.add(new Player(intPlayersConnected, 6*80, 2*80, strPlayerColour));
+                    playerList.add(new Player(intPlayersConnected, 2 * 80, 2 * 80, strPlayerColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
 
                 } else if (chooseRole == 1) {
@@ -227,30 +227,60 @@ public class GameModel implements ActionListener {
                     intPlayersConnected += 1;
                     String guestColour = message[1];
 
-                    playerList.add(new Player(intPlayersConnected, 600, 300, guestColour));
+                    int intSpawnX = 0;
+                    int intSpawnY = 0;
+
+                    if (intPlayersConnected == 2) {
+                        // Spawn in bottom right
+                        intSpawnX = 9 * 80;
+                        intSpawnY = 6 * 80;
+                    } else if (intPlayersConnected == 3) {
+                        // Spawn in bottom left
+                        intSpawnX = 6 * 80;
+                        intSpawnY = 6 * 80;
+                    } else if (intPlayersConnected == 4) {
+                        // Spawn in top right
+                        intSpawnX = 9 * 80;
+                        intSpawnY = 2 * 80;
+                    }
+
+                    playerList.add(new Player(intPlayersConnected, intSpawnX, intSpawnY, guestColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
                     chatArea.append("[SYSTEM] Guest joined as " + guestColour + "!\n");
                     
                     if (isServer) {
-                        ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour);
+                        ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour + "," + intMapChoice);
                     }
                 } else if (word.equals("hostInfo")) {
                     intPlayersConnected = Integer.parseInt(message[1]);
                     String hostColour = message[2];
+                    int hostMap = Integer.parseInt(message[3]);
 
-                    playerList.add(new Player(1, 400, 300, hostColour));
+                    intMapChoice = hostMap;
+                    if (intMapChoice != -1) {
+                        loadMap(mapFiles[intMapChoice]);
+                    }
+
+                    playerList.add(new Player(1, 4 * 80, 4 * 80, hostColour));
+
+                    int intHostSpawnX = 0;
+                    int intHostSpawnY = 0;
 
                     if (intPlayersConnected == 2) {
                         // Spawn in bottom right
-                        playerList.add(new Player(intPlayersConnected, 9*80, 6*80, strPlayerColour));
+                        intHostSpawnX = 9 * 80;
+                        intHostSpawnY = 6 * 80;
                     } else if (intPlayersConnected == 3) {
                         // Spawn in bottom left
-                        playerList.add(new Player(intPlayersConnected, 6*80, 6*80, strPlayerColour));
+                        intHostSpawnX = 6 * 80;
+                        intHostSpawnY = 6 * 80;
                     } else if (intPlayersConnected == 4) {
                         // Spawn in top right
-                        playerList.add(new Player(intPlayersConnected, 9*80, 2*80, strPlayerColour));
+                        intHostSpawnX = 9 * 80;
+                        intHostSpawnY = 2 * 80;
                     }
                     
+                    playerList.add(new Player(intPlayersConnected, intHostSpawnX, intHostSpawnY, strPlayerColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
 
                 } else if (word.equals("map")) {
