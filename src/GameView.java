@@ -42,6 +42,10 @@ public class GameView extends JPanel {
     BufferedImage imgPlayerGreen = null;
     BufferedImage imgPlayerPurple = null;
 
+    // instructions and credits images
+    BufferedImage imgInstructionPage = null;
+    BufferedImage imgCreditsPage = null;
+
     boolean choosingNetworkRole = false;
 
     // Methods
@@ -67,9 +71,9 @@ public class GameView extends JPanel {
                 }
             }
         } else if (intGameState == 2) { // help
-
+            g.drawImage(imgInstructionPage, 0, 0,null);
         } else if (intGameState == 3) { // credits
-
+            g.drawImage(imgCreditsPage, 0, 0,null);
         } else if (intGameState == 4) { // play
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, 1280, 720);
@@ -185,6 +189,10 @@ public class GameView extends JPanel {
         imgPlayerBlue = loadImage(".media/playerBlue.png");
         imgPlayerGreen = loadImage(".media/playerGreen.png");
         imgPlayerPurple = loadImage(".media/playerPurple.png");
+
+        // load instructions and credits page
+        imgInstructionPage = loadImage(".media/instructionsPage.png");
+        imgCreditsPage = loadImage(".media/creditsPage.png");
 
     }  
     
