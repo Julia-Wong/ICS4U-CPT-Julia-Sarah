@@ -9,6 +9,9 @@ public class Player {
     boolean downPressed;
     boolean leftPressed;
     boolean rightPressed;
+    int intCurrentRow;
+    int intCurrentCol;
+    int intFramesOnTile;
 
     // Methods
 
@@ -23,5 +26,8 @@ public class Player {
         this.downPressed = false;
         this.leftPressed = false;
         this.rightPressed = false;
+        this.intCurrentRow = -1;
+        this.intCurrentCol = -1;
+        this.intFramesOnTile = 0;
     }
 }

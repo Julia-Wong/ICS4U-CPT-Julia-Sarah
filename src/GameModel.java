@@ -165,7 +165,24 @@ public class GameModel implements ActionListener, KeyListener {
                             break;
                         }
                     }
+                } else if (word.equals("break")) {
+                    // update tile health
+                    int row = Integer.parseInt(message[1]);
+                    int col = Integer.parseInt(message[2]);
+                    int newHealth = Integer.parseInt(message[3]);
+
+                    thePanel.tileHealth[row][col] = newHealth;
+                } else if (word.equals("die")) {
+                    String playerDead = message[1];
+
+                    for (Player p: playerList) {
+                        if (p.strColour.equals(playerDead)) {
+                            p.isAlive = false;
+                            break;
+                        }
+                    }
                 }
+
                 showCurrentGUI();
                 return;
 
@@ -204,6 +221,51 @@ public class GameModel implements ActionListener, KeyListener {
                 }
 
                 // check collisions
+
+                // screen boundaries
+                if (myPlayer.intX < 0) {
+                    myPlayer.intX = 0;
+                }
+                if (myPlayer.intX > 1240) {
+                    myPlayer.intX = 1240;
+                }
+                if (myPlayer.intY < 0) {
+                    myPlayer.intY = 0;
+                }
+                if (myPlayer.intY > 680) {
+                    myPlayer.intY = 680;
+                }
+
+                int playerRow = (myPlayer.intY + 20) / 80;
+                int playerCol = (myPlayer.intX + 20) / 80;
+                int currentTileHeatlh = thePanel.tileHealth[playerRow][playerCol];
+
+                // check tiles
+                if (currentTileHeatlh == 3) { // check death
+                    myPlayer.isAlive = false;
+                    ssm.sendText("die," + strPlayerColour);
+                } else { // degrade tile
+                    if (playerRow != myPlayer.intCurrentRow || playerCol != myPlayer.intCurrentCol) { // if on new tile
+                        // update player location
+                        myPlayer.intCurrentRow = playerRow;
+                        myPlayer.intCurrentCol = playerCol;
+                        myPlayer.intFramesOnTile = 0;
+
+                        // damage tile
+                        thePanel.tileHealth[playerRow][playerCol] += 1;
+
+                        // send network message
+                        ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
+                    } else { // if standing on same tile
+                        myPlayer.intFramesOnTile += 1;
+                        if (myPlayer.intFramesOnTile >= 60) {
+                            thePanel.tileHealth[playerRow][playerCol] += 1;
+                            myPlayer.intFramesOnTile = 0;
+                            ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
+                        }
+                    }
+
+                }
 
             thePanel.repaint();
             return;
