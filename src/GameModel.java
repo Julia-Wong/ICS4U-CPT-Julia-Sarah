@@ -68,6 +68,7 @@ public class GameModel implements ActionListener, KeyListener {
     int intMapChoice = -1;
     int intPlayersConnected = 0;
     ArrayList<Player> playerList = new ArrayList<Player>();
+    int[][] crumbleTileTimer = new int[9][16];
 
     // Methods
     public void actionPerformed(ActionEvent evt) {
@@ -251,14 +252,21 @@ public class GameModel implements ActionListener, KeyListener {
                         myPlayer.intCurrentCol = playerCol;
                         myPlayer.intFramesOnTile = 0;
 
-                        // damage tile
-                        thePanel.tileHealth[playerRow][playerCol] += 1;
+                        if (thePanel.tileHealth[playerRow][playerCol] < 2) {
+                            // damage tile
+                            thePanel.tileHealth[playerRow][playerCol] += 1;
 
-                        // send network message
-                        ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
+                            // send network message
+                            ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
+                        } else if (thePanel.tileHealth[playerRow][playerCol] == 2) {
+                            if (crumbleTileTimer[playerRow][playerCol] == 0) {
+                                crumbleTileTimer[playerRow][playerCol] = 30;
+                            }
+                        }
+                        
                     } else { // if standing on same tile
                         myPlayer.intFramesOnTile += 1;
-                        if (myPlayer.intFramesOnTile >= 60) {
+                        if (myPlayer.intFramesOnTile >= 30) {
                             thePanel.tileHealth[playerRow][playerCol] += 1;
                             myPlayer.intFramesOnTile = 0;
                             ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
@@ -266,6 +274,20 @@ public class GameModel implements ActionListener, KeyListener {
                     }
 
                 }
+
+            for (int r = 0; r < thePanel.map.length; r++) {
+                for (int c = 0; c < thePanel.map[r].length; c++) {
+                    if (crumbleTileTimer[r][c] > 0) {
+                        crumbleTileTimer[r][c]--;
+
+                        if (crumbleTileTimer[r][c] == 0) {
+                            thePanel.tileHealth[r][c] = 3;
+                            ssm.sendText("break," + r + "," + c + ",3");
+                        }
+                    }
+                    
+                }
+            }
 
             thePanel.repaint();
             return;
