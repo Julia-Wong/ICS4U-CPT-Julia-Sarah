@@ -27,6 +27,8 @@ public class GameModel implements ActionListener, KeyListener {
     JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand dirt
     JButton floatingIslandMapButton = new JButton("Floating Island Map"); // grass dirt sand
     JButton playButton = new JButton("PLAY");
+    JLabel errorLabel = new JLabel("Minimum 2 Players to Start");
+    boolean playError = false;
 
     JTextArea chatArea = new JTextArea();
     JScrollPane scrollChatArea = new JScrollPane(chatArea);
@@ -62,6 +64,10 @@ public class GameModel implements ActionListener, KeyListener {
     JButton blueButton = new JButton("Blue");
     JButton greenButton = new JButton("Green");
     JButton purpleButton = new JButton("Purple");
+
+    JButton homeButton = new JButton("Home");
+    JLabel gameOverLabel = new JLabel("Game Over!");
+    JLabel winnerLabel = new JLabel();
 
     // Data
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
@@ -289,6 +295,32 @@ public class GameModel implements ActionListener, KeyListener {
                 }
             }
 
+            // check for winner
+            if (thePanel.intGameState == 4) {
+                int aliveCount = 0;
+                String winnerName = "";
+
+                for (Player p: playerList) {
+                    if (p.isAlive) {
+                        aliveCount++;
+                        winnerName = p.strColour;
+                    }
+                }
+
+                if (aliveCount <=1) {
+                    thePanel.intGameState = 5;
+                    theTimer.stop();
+
+                    if (aliveCount == 1) {
+                        winnerLabel.setText(winnerName + " WINS!");
+                    } else {
+                        winnerLabel.setText("DRAW! Everyone Fell!");
+                    }
+
+                    showCurrentGUI();
+                }
+            }
+
             thePanel.repaint();
             return;
         }
@@ -335,15 +367,20 @@ public class GameModel implements ActionListener, KeyListener {
                     ssm.sendText("map,2");
                 }
             } else if (evt.getSource() == playButton) {
-                thePanel.intGameState = 4;
-                if (isServer) {
-                    ssm.sendText("start");
-                }
-                theTimer.start();
-                thePanel.repaint();
+                if (playerList.size() > 1) {
+                    thePanel.intGameState = 4;
+                    if (isServer) {
+                        ssm.sendText("start");
+                    }
+                    theTimer.start();
+                    thePanel.repaint();
 
-                thePanel.setFocusable(true);
-                thePanel.requestFocusInWindow();
+                    thePanel.setFocusable(true);
+                    thePanel.requestFocusInWindow();
+                } else {
+                    playError = true;
+                }
+                
             } else if (evt.getSource() == chooseHostButton) {
                 chooseRole = 0;
             } else if (evt.getSource() == chooseJoinButton) {
@@ -478,6 +515,13 @@ public class GameModel implements ActionListener, KeyListener {
             if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
             }
+        }
+
+        // if on end screen
+        if (thePanel.intGameState == 5) {
+            if (evt.getSource() == homeButton) {
+                thePanel.intGameState = 0;
+            }      
         }
 
         showCurrentGUI();
@@ -622,6 +666,10 @@ public class GameModel implements ActionListener, KeyListener {
         playButton.addActionListener(this);
         thePanel.add(playButton);
 
+        // add error play label
+        errorLabel.setBounds(200, 500, 200, 50);
+        thePanel.add(errorLabel);
+
         // Add Chat
         scrollChatArea.setBounds(950, 0, 330, 150);
         thePanel.add(scrollChatArea);
@@ -697,6 +745,17 @@ public class GameModel implements ActionListener, KeyListener {
         confirmRoleButton.addActionListener(this);
         thePanel.add(confirmRoleButton);
 
+        // game over screen GUI
+        gameOverLabel.setBounds(300, 200, 400, 50);
+        thePanel.add(gameOverLabel);
+
+        winnerLabel.setBounds(300, 250, 400, 50);
+        thePanel.add(winnerLabel);
+
+        homeButton.setBounds(300, 500, 300, 100);
+        homeButton.addActionListener(this);
+        thePanel.add(homeButton);
+
         showCurrentGUI();
 
         // Set Frame
@@ -711,6 +770,7 @@ public class GameModel implements ActionListener, KeyListener {
         boolean isLobby = thePanel.intGameState == 1;
         boolean isHelp = thePanel.intGameState == 2;
         boolean isCredits = thePanel.intGameState == 3;
+        boolean isEndScreen = thePanel.intGameState == 5;
 
         thePanel.currentPlayers = this.playerList;
         thePanel.repaint();
@@ -760,12 +820,18 @@ public class GameModel implements ActionListener, KeyListener {
         oasisDesertMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
         floatingIslandMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
         playButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
+        errorLabel.setVisible(isLobby && isServer && !thePanel.choosingNetworkRole && playError);
         
 
         // if on help screen:
 
         // if on credits screen:
 
+
+        // if on end screen
+        gameOverLabel.setVisible(isEndScreen);
+        winnerLabel.setVisible(isEndScreen);
+        homeButton.setVisible(isEndScreen);
     }
 
     // Main Program
