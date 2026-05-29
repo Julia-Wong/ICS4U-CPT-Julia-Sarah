@@ -146,6 +146,9 @@ public class GameModel implements ActionListener, KeyListener {
                     thePanel.intGameState = 4;
                     chatArea.append("[SYSTEM] Game starting!\n");
                     theTimer.start();
+
+                    thePanel.setFocusable(true);
+                    thePanel.requestFocusInWindow();
                 } else if (word.equals("chat")) {
                     if (message.length >= 3) {
                         chatArea.append("[" + message[1] + "] " + message[2] + "\n");
@@ -168,17 +171,43 @@ public class GameModel implements ActionListener, KeyListener {
 
             }
             
-            if (evt.getSource() == theTimer) {
-                for (Player p: playerList) {
-                    // move players
-                    
-                    // check collisions
+        if (evt.getSource() == theTimer) {
+            Player myPlayer = null;
+            for (Player p: playerList) {
+                if (p.strColour.equals(strPlayerColour)) {
+                    myPlayer = p;
+                    break;
+                }
+            }
 
+            // move players
+                if (myPlayer != null && myPlayer.isAlive) {
+                    int intOldX = myPlayer.intX;
+                    int intOldY = myPlayer.intY;
+
+                    if (myPlayer.upPressed == true) {
+                        myPlayer.intY -= intGameSpeed;
+                    }
+                    if (myPlayer.downPressed == true) {
+                        myPlayer.intY += intGameSpeed;
+                    }
+                    if (myPlayer.rightPressed == true) {
+                        myPlayer.intX += intGameSpeed;
+                    }
+                    if (myPlayer.leftPressed == true) {
+                        myPlayer.intX -= intGameSpeed;
+                    }
+
+                    if (myPlayer.intX != intOldX || myPlayer.intY != intOldY) {
+                        ssm.sendText("move," + strPlayerColour + "," + myPlayer.intX + "," + myPlayer.intY);
+                    }
                 }
 
-                thePanel.repaint();
-                return;
-            }
+                // check collisions
+
+            thePanel.repaint();
+            return;
+        }
 
         // if on homescreen
         if (thePanel.intGameState == 0) {
@@ -228,6 +257,9 @@ public class GameModel implements ActionListener, KeyListener {
                 }
                 theTimer.start();
                 thePanel.repaint();
+
+                thePanel.setFocusable(true);
+                thePanel.requestFocusInWindow();
             } else if (evt.getSource() == chooseHostButton) {
                 chooseRole = 0;
             } else if (evt.getSource() == chooseJoinButton) {
