@@ -375,8 +375,7 @@ public class GameModel implements ActionListener, KeyListener {
         if (thePanel.intGameState != 4) {
             return;
         }
-        int key = evt.getKeyCode();
-
+        
         Player myPlayer = null;
         for (Player p: playerList) {
             if (p.strColour.equals(strPlayerColour)) {
@@ -389,13 +388,13 @@ public class GameModel implements ActionListener, KeyListener {
             return;
         }
 
-        if (key == KeyEvent.VK_W) {
+        if (evt.getKeyChar() == 'w' || evt.getKeyChar() == 'W') {
             myPlayer.upPressed = true;
-        } else if (key == KeyEvent.VK_S) {
+        } else if (evt.getKeyChar() == 's' || evt.getKeyChar() == 'S') {
             myPlayer.downPressed = true;
-        } else if (key == KeyEvent.VK_A) {
+        } else if (evt.getKeyChar() == 'a' || evt.getKeyChar() == 'A') {
             myPlayer.leftPressed = true;
-        } else if (key == KeyEvent.VK_D) {
+        } else if (evt.getKeyChar() == 'd' || evt.getKeyChar() == 'D') {
             myPlayer.rightPressed = true;
         }
     }
@@ -404,7 +403,6 @@ public class GameModel implements ActionListener, KeyListener {
         if (thePanel.intGameState != 4) {
             return;
         }
-        int key = evt.getKeyCode();
 
         Player myPlayer = null;
         for (Player p: playerList) {
@@ -418,13 +416,13 @@ public class GameModel implements ActionListener, KeyListener {
             return;
         }
 
-        if (key == KeyEvent.VK_W) {
+        if (evt.getKeyChar() == 'w' || evt.getKeyChar() == 'W') {
             myPlayer.upPressed = false;
-        } else if (key == KeyEvent.VK_S) {
+        } else if (evt.getKeyChar() == 's' || evt.getKeyChar() == 'S') {
             myPlayer.downPressed = false;
-        } else if (key == KeyEvent.VK_A) {
+        } else if (evt.getKeyChar() == 'a' || evt.getKeyChar() == 'A') {
             myPlayer.leftPressed = false;
-        } else if (key == KeyEvent.VK_D) {
+        } else if (evt.getKeyChar() == 'd' || evt.getKeyChar() == 'D') {
             myPlayer.rightPressed = false;
         }
     }
