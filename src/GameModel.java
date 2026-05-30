@@ -27,8 +27,7 @@ public class GameModel implements ActionListener, KeyListener {
     JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand dirt
     JButton floatingIslandMapButton = new JButton("Floating Island Map"); // grass dirt sand
     JButton playButton = new JButton("PLAY");
-    JLabel errorLabel = new JLabel("Minimum 2 Players to Start");
-    boolean playError = false;
+    JLabel setupErrorLabel = new JLabel();
 
     JTextArea chatArea = new JTextArea();
     JScrollPane scrollChatArea = new JScrollPane(chatArea);
@@ -367,7 +366,27 @@ public class GameModel implements ActionListener, KeyListener {
                     ssm.sendText("map,2");
                 }
             } else if (evt.getSource() == playButton) {
-                if (playerList.size() > 1) {
+                boolean hasDuplicateColours = false;
+
+                // go compare all player colours to one another
+                for (int i = 0; i < playerList.size(); i++) {
+                    for (int j = i + 1; j < playerList.size(); j++) {
+                        if (playerList.get(i).strColour.equals(playerList.get(j).strColour)) {
+                            hasDuplicateColours = true;
+                        }
+                    }
+                }
+
+                // check all rules before playing
+                if (intMapChoice == -1) {
+                    chatArea.append("[SYSTEM] Please select a map first!\n");
+                } else if (playerList.size() < 2) {
+                    chatArea.append("[SYSTEM] Minimum 2 players required!\n");
+                } else if (playerList.size() > 4) {
+                    chatArea.append("[SYSTEM] Maximum 4 players allowed!\n");
+                } else if (hasDuplicateColours) {
+                    chatArea.append("[SYSTEM] Players cannot share the same colour!\n");
+                } else {
                     thePanel.intGameState = 4;
                     if (isServer) {
                         ssm.sendText("start");
@@ -377,8 +396,6 @@ public class GameModel implements ActionListener, KeyListener {
 
                     thePanel.setFocusable(true);
                     thePanel.requestFocusInWindow();
-                } else {
-                    playError = true;
                 }
                 
             } else if (evt.getSource() == chooseHostButton) {
@@ -387,12 +404,12 @@ public class GameModel implements ActionListener, KeyListener {
                 chooseRole = 1;
             } else if (evt.getSource() == confirmRoleButton) {
                 if (chooseRole == -1) {
-                    chatArea.append("[SYSTEM] Please select a Host or Join before confirming.\n");
+                    setupErrorLabel.setText("Please select Host or Join first!");
                     return;
                 }
                 
                 if (strPlayerColour == null) {
-                    chatArea.append("[SYSTEM] Please select a player colour before confirming.\n");
+                    setupErrorLabel.setText("Please select a player colour!");
                     return;
                 }
 
@@ -415,6 +432,7 @@ public class GameModel implements ActionListener, KeyListener {
                     
                     playerList.add(new Player(intPlayersConnected, 6 * 80, 2 * 80, strPlayerColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+                    setupErrorLabel.setText("");
 
                 } else if (chooseRole == 1) {
                     // JOIN MODE
@@ -433,6 +451,7 @@ public class GameModel implements ActionListener, KeyListener {
                         chatArea.append("[SYSTEM] Connected to server...\n");
 
                         ssm.sendText("hello," + strPlayerColour);
+                        setupErrorLabel.setText("");
                     // If failed to connect
                     } else {
                         chatArea.append("[SYSTEM] Failed to connect to server. Please check the IP address and try again.\n");
@@ -666,9 +685,8 @@ public class GameModel implements ActionListener, KeyListener {
         playButton.addActionListener(this);
         thePanel.add(playButton);
 
-        // add error play label
-        errorLabel.setBounds(200, 500, 200, 50);
-        thePanel.add(errorLabel);
+        setupErrorLabel.setBounds(20, 600, 400, 50);
+        thePanel.add(setupErrorLabel);
 
         // Add Chat
         scrollChatArea.setBounds(950, 0, 330, 150);
@@ -808,6 +826,7 @@ public class GameModel implements ActionListener, KeyListener {
 
         // confirm
         confirmRoleButton.setVisible(isLobby & thePanel.choosingNetworkRole);
+        setupErrorLabel.setVisible(isLobby && thePanel.choosingNetworkRole);
 
         // real lobby
         joiningIPInfo.setVisible(isLobby && !thePanel.choosingNetworkRole && chooseRole == 0);
@@ -820,7 +839,6 @@ public class GameModel implements ActionListener, KeyListener {
         oasisDesertMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
         floatingIslandMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
         playButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
-        errorLabel.setVisible(isLobby && isServer && !thePanel.choosingNetworkRole && playError);
         
 
         // if on help screen:
