@@ -45,6 +45,7 @@ public class GameView extends JPanel {
     // instructions and credits images
     BufferedImage imgInstructionPage = null;
     BufferedImage imgCreditsPage = null;
+    BufferedImage imgHomeScreen = null;
 
     boolean choosingNetworkRole = false;
 
@@ -53,7 +54,9 @@ public class GameView extends JPanel {
         super.paintComponent(g);
 
         if (intGameState == 0) { // home
-            
+            if (imgHomeScreen != null) {
+                g.drawImage(imgHomeScreen, 0, 0, null);
+            }
         } else if (intGameState == 1) { // lobby
             if (choosingNetworkRole == false && currentPlayers != null) {
                 for (Player p: currentPlayers) {
@@ -190,9 +193,10 @@ public class GameView extends JPanel {
         imgPlayerGreen = loadImage(".media/playerGreen.png");
         imgPlayerPurple = loadImage(".media/playerPurple.png");
 
-        // load instructions and credits page
+        // load instructions, credits, home, lobby, end screen pages
         imgInstructionPage = loadImage(".media/instructionsPage.png");
         imgCreditsPage = loadImage(".media/creditsPage.png");
+        imgHomeScreen = loadImage(".media/homescreenSpleefBg.png");
 
     }  
     

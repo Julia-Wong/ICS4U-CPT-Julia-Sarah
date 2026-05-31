@@ -12,7 +12,7 @@ public class GameModel implements ActionListener, KeyListener {
     Timer theTimer = new Timer(1000/60, this);
 
     // Home Screen
-    JLabel titleSpleef = new JLabel("Spleef");
+    //JLabel titleSpleef = new JLabel("Spleef");
     JButton lobbyButton = new JButton("Lobby");
     JButton helpButton = new JButton("Help");
     JButton creditsButton = new JButton("Credits");
@@ -639,19 +639,19 @@ public class GameModel implements ActionListener, KeyListener {
         thePanel.addKeyListener(this);
 
         // Add Title
-        titleSpleef.setBounds(500, 100, 400, 100);
-        thePanel.add(titleSpleef);
+        //titleSpleef.setBounds(500, 100, 400, 100);
+        //thePanel.add(titleSpleef);
 
         // Add Homescreen Buttons
-        lobbyButton.setBounds(400, 300, 400, 100);
+        lobbyButton.setBounds(465, 325, 350, 95);
         lobbyButton.addActionListener(this);
         thePanel.add(lobbyButton);
 
-        helpButton.setBounds(400, 400, 400, 100);
+        helpButton.setBounds(465, 440, 350, 95);
         helpButton.addActionListener(this);
         thePanel.add(helpButton);
 
-        creditsButton.setBounds(400, 500, 400, 100);
+        creditsButton.setBounds(465, 555, 350, 95);
         creditsButton.addActionListener(this);
         thePanel.add(creditsButton);
 
@@ -795,7 +795,7 @@ public class GameModel implements ActionListener, KeyListener {
 
         // draw shared J Components
         backButton.setVisible(isLobby || isHelp || isCredits);
-        titleSpleef.setVisible(isHome || isLobby);
+        //titleSpleef.setVisible(isHome || isLobby);
 
         // if on home screen:
         lobbyButton.setVisible(isHome);
