@@ -78,121 +78,121 @@ public class GameModel implements ActionListener, KeyListener {
     // Methods
     public void actionPerformed(ActionEvent evt) {
         if (evt.getSource() == ssm && ssm != null) {
-                // Read and separate incoming messages
-                String incomingMessage = ssm.readText();
-                String[] message = incomingMessage.split(",");
-                String word = message[0];
+            // Read and separate incoming messages
+            String incomingMessage = ssm.readText();
+            String[] message = incomingMessage.split(",");
+            String word = message[0];
 
-                if (word.equals("hello")) {
-                    intPlayersConnected += 1;
-                    String guestColour = message[1];
+            if (word.equals("hello")) {
+                intPlayersConnected += 1;
+                String guestColour = message[1];
 
-                    int intSpawnX = 0;
-                    int intSpawnY = 0;
+                int intSpawnX = 0;
+                int intSpawnY = 0;
 
-                    if (intPlayersConnected == 2) {
-                        // Spawn in bottom right
-                        intSpawnX = 9 * 80;
-                        intSpawnY = 6 * 80;
-                    } else if (intPlayersConnected == 3) {
-                        // Spawn in bottom left
-                        intSpawnX = 6 * 80;
-                        intSpawnY = 6 * 80;
-                    } else if (intPlayersConnected == 4) {
-                        // Spawn in top right
-                        intSpawnX = 9 * 80;
-                        intSpawnY = 2 * 80;
-                    }
-
-                    playerList.add(new Player(intPlayersConnected, intSpawnX, intSpawnY, guestColour));
-                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
-                    chatArea.append("[SYSTEM] Guest joined as " + guestColour + "!\n");
-                    
-                    if (isServer) {
-                        ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour + "," + intMapChoice);
-                    }
-                } else if (word.equals("hostInfo")) {
-                    intPlayersConnected = Integer.parseInt(message[1]);
-                    String hostColour = message[2];
-                    int hostMap = Integer.parseInt(message[3]);
-
-                    intMapChoice = hostMap;
-                    if (intMapChoice != -1) {
-                        loadMap(mapFiles[intMapChoice]);
-                    }
-
-                    playerList.clear();
-                    playerList.add(new Player(1, 6 * 80, 2 * 80, hostColour));
-
-                    int intHostSpawnX = 0;
-                    int intHostSpawnY = 0;
-
-                    if (intPlayersConnected == 2) {
-                        // Spawn in bottom right
-                        intHostSpawnX = 9 * 80;
-                        intHostSpawnY = 6 * 80;
-                    } else if (intPlayersConnected == 3) {
-                        // Spawn in bottom left
-                        intHostSpawnX = 6 * 80;
-                        intHostSpawnY = 6 * 80;
-                    } else if (intPlayersConnected == 4) {
-                        // Spawn in top right
-                        intHostSpawnX = 9 * 80;
-                        intHostSpawnY = 2 * 80;
-                    }
-                    
-                    playerList.add(new Player(intPlayersConnected, intHostSpawnX, intHostSpawnY, strPlayerColour));
-                    playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
-
-                } else if (word.equals("map")) {
-                    intMapChoice = Integer.parseInt(message[1]);
-                    loadMap(mapFiles[intMapChoice]);
-                    chatArea.append("[SYSTEM] Host changed map to option " + intMapChoice + "\n");
-                } else if (word.equals("start")) {
-                    thePanel.intGameState = 4;
-                    chatArea.append("[SYSTEM] Game starting!\n");
-                    theTimer.start();
-
-                    thePanel.setFocusable(true);
-                    thePanel.requestFocusInWindow();
-                } else if (word.equals("chat")) {
-                    if (message.length >= 3) {
-                        chatArea.append("[" + message[1] + "] " + message[2] + "\n");
-                    }
-                } else if (word.equals("move")) {
-                    String movingPlayerColour = message[1];
-                    int newX = Integer.parseInt(message[2]);
-                    int newY = Integer.parseInt(message[3]);
-
-                    for (Player p: playerList) {
-                        if (p.strColour.equals(movingPlayerColour)) {
-                            p.intX = newX;
-                            p.intY = newY;
-                            break;
-                        }
-                    }
-                } else if (word.equals("break")) {
-                    // update tile health
-                    int row = Integer.parseInt(message[1]);
-                    int col = Integer.parseInt(message[2]);
-                    int newHealth = Integer.parseInt(message[3]);
-
-                    thePanel.tileHealth[row][col] = newHealth;
-                } else if (word.equals("die")) {
-                    String playerDead = message[1];
-
-                    for (Player p: playerList) {
-                        if (p.strColour.equals(playerDead)) {
-                            p.isAlive = false;
-                            break;
-                        }
-                    }
+                if (intPlayersConnected == 2) {
+                    // Spawn in bottom right
+                    intSpawnX = 9 * 80;
+                    intSpawnY = 6 * 80;
+                } else if (intPlayersConnected == 3) {
+                    // Spawn in bottom left
+                    intSpawnX = 6 * 80;
+                    intSpawnY = 6 * 80;
+                } else if (intPlayersConnected == 4) {
+                    // Spawn in top right
+                    intSpawnX = 9 * 80;
+                    intSpawnY = 2 * 80;
                 }
 
-                showCurrentGUI();
-                return;
+                playerList.add(new Player(intPlayersConnected, intSpawnX, intSpawnY, guestColour));
+                playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+                chatArea.append("[SYSTEM] Guest joined as " + guestColour + "!\n");
+                
+                if (isServer) {
+                    ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour + "," + intMapChoice);
+                }
+            } else if (word.equals("hostInfo")) {
+                intPlayersConnected = Integer.parseInt(message[1]);
+                String hostColour = message[2];
+                int hostMap = Integer.parseInt(message[3]);
 
+                intMapChoice = hostMap;
+                if (intMapChoice != -1) {
+                    loadMap(mapFiles[intMapChoice]);
+                }
+
+                playerList.clear();
+                playerList.add(new Player(1, 6 * 80, 2 * 80, hostColour));
+
+                int intHostSpawnX = 0;
+                int intHostSpawnY = 0;
+
+                if (intPlayersConnected == 2) {
+                    // Spawn in bottom right
+                    intHostSpawnX = 9 * 80;
+                    intHostSpawnY = 6 * 80;
+                } else if (intPlayersConnected == 3) {
+                    // Spawn in bottom left
+                    intHostSpawnX = 6 * 80;
+                    intHostSpawnY = 6 * 80;
+                } else if (intPlayersConnected == 4) {
+                    // Spawn in top right
+                    intHostSpawnX = 9 * 80;
+                    intHostSpawnY = 2 * 80;
+                }
+                
+                playerList.add(new Player(intPlayersConnected, intHostSpawnX, intHostSpawnY, strPlayerColour));
+                playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
+
+            } else if (word.equals("map")) {
+                intMapChoice = Integer.parseInt(message[1]);
+                loadMap(mapFiles[intMapChoice]);
+                chatArea.append("[SYSTEM] Host changed map to option " + intMapChoice + "\n");
+            } else if (word.equals("start")) {
+                thePanel.intGameState = 4;
+                chatArea.append("[SYSTEM] Game starting!\n");
+                theTimer.start();
+
+                thePanel.setFocusable(true);
+                thePanel.requestFocusInWindow();
+            } else if (word.equals("chat")) {
+                if (message.length >= 3) {
+                    chatArea.append("[" + message[1] + "] " + message[2] + "\n");
+                }
+            } else if (word.equals("move")) {
+                String movingPlayerColour = message[1];
+                int newX = Integer.parseInt(message[2]);
+                int newY = Integer.parseInt(message[3]);
+
+                for (Player p: playerList) {
+                    if (p.strColour.equals(movingPlayerColour)) {
+                        p.intX = newX;
+                        p.intY = newY;
+                        break;
+                    }
+                }
+            } else if (word.equals("break")) {
+                // update tile health
+                int row = Integer.parseInt(message[1]);
+                int col = Integer.parseInt(message[2]);
+                int newHealth = Integer.parseInt(message[3]);
+
+                thePanel.tileHealth[row][col] = newHealth;
+            } else if (word.equals("die")) {
+                String playerDead = message[1];
+
+                for (Player p: playerList) {
+                    if (p.strColour.equals(playerDead)) {
+                        p.isAlive = false;
+                        break;
+                    }
+                }
             }
+
+            showCurrentGUI();
+            return;
+
+        }
             
         if (evt.getSource() == theTimer) {
             Player myPlayer = null;
