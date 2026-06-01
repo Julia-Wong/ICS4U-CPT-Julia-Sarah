@@ -20,6 +20,11 @@ public class GameModel implements ActionListener, KeyListener {
     // Back Buttons
     JButton backButton = new JButton("← Back");
 
+    // Help Buttons
+    JButton demoButton = new JButton("Demo");
+    JButton demoResetButton = new JButton("Reset Demo");
+    JButton demoBackButton = new JButton("Exit Demo");
+
     // Lobby Buttons
     JLabel playersConnectedLabel = new JLabel();
     JLabel chooseMapLabel = new JLabel("Choose a Map: ");
@@ -320,6 +325,81 @@ public class GameModel implements ActionListener, KeyListener {
                     showCurrentGUI();
                 }
             }
+            if (thePanel.intGameState == 6) {
+                Player myPlayerDemo = null;
+                if (!playerList.isEmpty()) {
+                    myPlayerDemo = playerList.get(0);
+                }
+
+                // Movement
+                if (myPlayerDemo != null && myPlayerDemo.isAlive) {
+                    if (myPlayerDemo.upPressed == true) {
+                        myPlayer.intY -= intGameSpeed;
+                    }
+                    if (myPlayer.downPressed == true) {
+                        myPlayer.intY += intGameSpeed;
+                    }
+                    if (myPlayer.rightPressed == true) {
+                        myPlayer.intX += intGameSpeed;
+                    }
+                    if (myPlayer.leftPressed == true) {
+                        myPlayer.intX -= intGameSpeed;
+                    }
+                }
+
+                // Bounds
+                if (myPlayer.intX < 0) {
+                    myPlayer.intX = 0;
+                } if (myPlayer.intX > 1240) {
+                    myPlayer.intX = 1240;
+                } if (myPlayer.intY < 0) {
+                    myPlayer.intY = 0;
+                } if (myPlayer.intY > 680) {
+                    myPlayer.intY = 680;
+                }
+
+                // Tiles
+                int playerRowDemo = (myPlayer.intY + 20)/80;
+                int playerColDemo = (myPlayer.intX + 20)/80;
+
+                if (thePanel.tileHealth[playerRowDemo][playerColDemo] == 3) {
+                    myPlayer.isAlive = false;
+                } else {
+                    if (playerRowDemo != myPlayer.intCurrentRow || playerColDemo != myPlayer.intCurrentCol) {
+                        myPlayer.intCurrentRow = playerRowDemo;
+                        myPlayer.intCurrentCol = playerColDemo;
+                        myPlayer.intFramesOnTile = 0;
+
+                        if (thePanel.tileHealth[playerRowDemo][playerColDemo] < 2) {
+                            thePanel.tileHealth[playerRowDemo][playerColDemo] += 1;
+                        } else if (thePanel.tileHealth[playerRowDemo][playerColDemo] == 2) {
+                            if (crumbleTileTimer[playerRowDemo][playerColDemo] == 0) {
+                                crumbleTileTimer[playerRowDemo][playerColDemo] = 30;
+                            }
+                        }
+                    } else {
+                        myPlayer.intFramesOnTile += 1;
+                        if (myPlayer.intFramesOnTile >= 30) {
+                            thePanel.tileHealth[playerRowDemo][playerColDemo] += 1;
+                            myPlayer.intFramesOnTile = 0;
+                        }
+                    }
+                }
+            }
+
+            // Countdown
+            for (int r = 0; r < 9; r++) {
+                for (int c = 0; c < 16; c++) {
+                    if (crumbleTileTimer[r][c] > 0) {
+                        crumbleTileTimer[r][c]--;
+
+                        if (crumbleTileTimer[r][c] == 0) {
+                            thePanel.tileHealth[r][c] = 3;
+                        }
+                    }
+                }
+            }
+            showCurrentGUI();
 
             thePanel.repaint();
             return;
@@ -544,6 +624,28 @@ public class GameModel implements ActionListener, KeyListener {
         if (thePanel.intGameState == 2) {
             if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
+            } else if (evt.getSource() == demoButton || evt.getSource() == demoResetButton) {
+                thePanel.intGameState = 6;
+
+                for (int r = 0; r > 0; r++) {
+                    for (int c = 0; c > 0; c++) {
+                        thePanel.tileHealth[r][c] = 0;
+                    }
+                }
+
+                playerList.clear();
+                strPlayerColour = "Red";
+                playerList.add(new Player(1, 8*80, 4*80, strPlayerColour));
+
+                theTimer.start();
+                thePanel.repaint();
+
+                thePanel.setFocusable(true);
+                thePanel.requestFocusInWindow();
+
+            } else if (evt.getSource() == demoBackButton) {
+                theTimer.stop();
+                thePanel.intGameState = 2;   
             }
         }
 
@@ -589,7 +691,7 @@ public class GameModel implements ActionListener, KeyListener {
     }
 
     public void keyPressed(KeyEvent evt) {
-        if (thePanel.intGameState != 4) {
+        if (thePanel.intGameState != 4 && thePanel.intGameState != 6) {
             return;
         }
         
@@ -617,7 +719,7 @@ public class GameModel implements ActionListener, KeyListener {
     }
 
     public void keyReleased(KeyEvent evt) {
-        if (thePanel.intGameState != 4) {
+        if (thePanel.intGameState != 4 && thePanel.intGameState != 6) {
             return;
         }
 
@@ -692,6 +794,19 @@ public class GameModel implements ActionListener, KeyListener {
         creditsButton.setBounds(465, 555, 350, 95);
         creditsButton.addActionListener(this);
         thePanel.add(creditsButton);
+
+        // Add Help Buttons
+        demoButton.setBounds(765, 655, 50, 55);
+        demoButton.addActionListener(this);
+        thePanel.add(demoButton);
+
+        demoResetButton.setBounds(490, 300, 300, 50);
+        demoResetButton.addActionListener(this);
+        thePanel.add(demoResetButton);
+
+        demoBackButton.setBounds(10, 60, 100, 40);
+        demoBackButton.addActionListener(this);
+        thePanel.add(demoBackButton);
 
         // Add Back Button
         backButton.setBounds(10, 10, 80, 40);
@@ -827,6 +942,7 @@ public class GameModel implements ActionListener, KeyListener {
         boolean isHelp = thePanel.intGameState == 2;
         boolean isCredits = thePanel.intGameState == 3;
         boolean isEndScreen = thePanel.intGameState == 5;
+        boolean isDemo = thePanel.intGameState == 6;
 
         thePanel.currentPlayers = this.playerList;
         thePanel.repaint();
@@ -880,6 +996,11 @@ public class GameModel implements ActionListener, KeyListener {
         
 
         // if on help screen:
+        demoButton.setVisible(isHelp);
+        demoBackButton.setVisible(isDemo);
+
+        boolean playerIsDead = playerList.isEmpty() || !playerList.get(0).isAlive;
+        demoResetButton.setVisible(isDemo && playerIsDead);
 
         // if on credits screen:
 

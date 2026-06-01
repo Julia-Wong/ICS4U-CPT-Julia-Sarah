@@ -77,7 +77,7 @@ public class GameView extends JPanel {
             g.drawImage(imgInstructionPage, 0, 0,null);
         } else if (intGameState == 3) { // credits
             g.drawImage(imgCreditsPage, 0, 0,null);
-        } else if (intGameState == 4) { // play
+        } else if (intGameState == 4 || intGameState == 6) { // play
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, 1280, 720);
 
