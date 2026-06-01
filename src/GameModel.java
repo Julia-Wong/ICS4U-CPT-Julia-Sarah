@@ -334,41 +334,41 @@ public class GameModel implements ActionListener, KeyListener {
                 // Movement
                 if (myPlayerDemo != null && myPlayerDemo.isAlive) {
                     if (myPlayerDemo.upPressed == true) {
-                        myPlayer.intY -= intGameSpeed;
+                        myPlayerDemo.intY -= intGameSpeed;
                     }
-                    if (myPlayer.downPressed == true) {
-                        myPlayer.intY += intGameSpeed;
+                    if (myPlayerDemo.downPressed == true) {
+                        myPlayerDemo.intY += intGameSpeed;
                     }
-                    if (myPlayer.rightPressed == true) {
-                        myPlayer.intX += intGameSpeed;
+                    if (myPlayerDemo.rightPressed == true) {
+                        myPlayerDemo.intX += intGameSpeed;
                     }
-                    if (myPlayer.leftPressed == true) {
-                        myPlayer.intX -= intGameSpeed;
+                    if (myPlayerDemo.leftPressed == true) {
+                        myPlayerDemo.intX -= intGameSpeed;
                     }
                 }
 
                 // Bounds
-                if (myPlayer.intX < 0) {
-                    myPlayer.intX = 0;
-                } if (myPlayer.intX > 1240) {
-                    myPlayer.intX = 1240;
-                } if (myPlayer.intY < 0) {
-                    myPlayer.intY = 0;
-                } if (myPlayer.intY > 680) {
-                    myPlayer.intY = 680;
+                if (myPlayerDemo.intX < 0) {
+                    myPlayerDemo.intX = 0;
+                } if (myPlayerDemo.intX > 1240) {
+                    myPlayerDemo.intX = 1240;
+                } if (myPlayerDemo.intY < 0) {
+                    myPlayerDemo.intY = 0;
+                } if (myPlayerDemo.intY > 680) {
+                    myPlayerDemo.intY = 680;
                 }
 
                 // Tiles
-                int playerRowDemo = (myPlayer.intY + 20)/80;
-                int playerColDemo = (myPlayer.intX + 20)/80;
+                int playerRowDemo = (myPlayerDemo.intY + 20)/80;
+                int playerColDemo = (myPlayerDemo.intX + 20)/80;
 
                 if (thePanel.tileHealth[playerRowDemo][playerColDemo] == 3) {
-                    myPlayer.isAlive = false;
+                    myPlayerDemo.isAlive = false;
                 } else {
-                    if (playerRowDemo != myPlayer.intCurrentRow || playerColDemo != myPlayer.intCurrentCol) {
-                        myPlayer.intCurrentRow = playerRowDemo;
-                        myPlayer.intCurrentCol = playerColDemo;
-                        myPlayer.intFramesOnTile = 0;
+                    if (playerRowDemo != myPlayerDemo.intCurrentRow || playerColDemo != myPlayerDemo.intCurrentCol) {
+                        myPlayerDemo.intCurrentRow = playerRowDemo;
+                        myPlayerDemo.intCurrentCol = playerColDemo;
+                        myPlayerDemo.intFramesOnTile = 0;
 
                         if (thePanel.tileHealth[playerRowDemo][playerColDemo] < 2) {
                             thePanel.tileHealth[playerRowDemo][playerColDemo] += 1;
@@ -378,10 +378,10 @@ public class GameModel implements ActionListener, KeyListener {
                             }
                         }
                     } else {
-                        myPlayer.intFramesOnTile += 1;
-                        if (myPlayer.intFramesOnTile >= 30) {
+                        myPlayerDemo.intFramesOnTile += 1;
+                        if (myPlayerDemo.intFramesOnTile >= 30) {
                             thePanel.tileHealth[playerRowDemo][playerColDemo] += 1;
-                            myPlayer.intFramesOnTile = 0;
+                            myPlayerDemo.intFramesOnTile = 0;
                         }
                     }
                 }
@@ -624,18 +624,28 @@ public class GameModel implements ActionListener, KeyListener {
         if (thePanel.intGameState == 2) {
             if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
-            } else if (evt.getSource() == demoButton || evt.getSource() == demoResetButton) {
+            } 
+            
+            if (evt.getSource() == demoButton || evt.getSource() == demoResetButton) {
                 thePanel.intGameState = 6;
 
-                for (int r = 0; r > 0; r++) {
-                    for (int c = 0; c > 0; c++) {
+                for (int r = 0; r < 9; r++) {
+                    for (int c = 0; c < 16; c++) {
+                        thePanel.map[r][c] = 0;
+                        thePanel.tileHealth[r][c] = 3;
+                        crumbleTileTimer[r][c] = 0;
+                    }
+                }
+
+                for (int r = 3; r <= 5; r++) {
+                    for (int c = 6; c <= 8; c++) {
                         thePanel.tileHealth[r][c] = 0;
                     }
                 }
 
                 playerList.clear();
                 strPlayerColour = "Red";
-                playerList.add(new Player(1, 8*80, 4*80, strPlayerColour));
+                playerList.add(new Player(1, 7*80, 4*80, strPlayerColour));
 
                 theTimer.start();
                 thePanel.repaint();
@@ -643,7 +653,9 @@ public class GameModel implements ActionListener, KeyListener {
                 thePanel.setFocusable(true);
                 thePanel.requestFocusInWindow();
 
-            } else if (evt.getSource() == demoBackButton) {
+            } 
+            
+            if (evt.getSource() == demoBackButton) {
                 theTimer.stop();
                 thePanel.intGameState = 2;   
             }
@@ -804,7 +816,7 @@ public class GameModel implements ActionListener, KeyListener {
         demoResetButton.addActionListener(this);
         thePanel.add(demoResetButton);
 
-        demoBackButton.setBounds(10, 60, 100, 40);
+        demoBackButton.setBounds(10, 10, 80, 40);
         demoBackButton.addActionListener(this);
         thePanel.add(demoBackButton);
 
