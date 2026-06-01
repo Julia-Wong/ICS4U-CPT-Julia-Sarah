@@ -109,12 +109,13 @@ public class GameModel implements ActionListener, KeyListener {
                 chatArea.append("[SYSTEM] Guest joined as " + guestColour + "!\n");
                 
                 if (isServer) {
-                    ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour + "," + intMapChoice);
+                    ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour + "," + intMapChoice + "," + intGameSpeed);
                 }
             } else if (word.equals("hostInfo")) {
                 intPlayersConnected = Integer.parseInt(message[1]);
                 String hostColour = message[2];
                 int hostMap = Integer.parseInt(message[3]);
+                intGameSpeed = Integer.parseInt(message[4]);
 
                 intMapChoice = hostMap;
                 if (intMapChoice != -1) {
@@ -340,9 +341,26 @@ public class GameModel implements ActionListener, KeyListener {
         // if on lobby screen
         if (thePanel.intGameState == 1) {
             if (evt.getSource() == backButton) {
-                if (thePanel.intGameState == 1 && !thePanel.choosingNetworkRole && chooseRole != -1) {
-                    intPlayersConnected -= 1;
+               if (ssm != null) {
+                    ssm.disconnect();
+                    ssm = null;
                 }
+
+                playerList.clear();
+                intPlayersConnected = 0;
+                strPlayerColour = null;
+                chooseRole = -1;
+                isServer = false;
+                thePanel.tileHealth = new int[9][16];
+                crumbleTileTimer = new int[9][16];
+                intMapChoice = -1;
+
+                chatArea.setText("");
+                chatInput.setText("");
+                playersConnectedLabel.setText("");
+                joiningIPInfo.setText("");
+                setupErrorLabel.setText("");
+
                 thePanel.intGameState = 0;
             } else if (evt.getSource() == alpineTundraMapButton) {
                 intMapChoice = 0;
@@ -539,6 +557,26 @@ public class GameModel implements ActionListener, KeyListener {
         // if on end screen
         if (thePanel.intGameState == 5) {
             if (evt.getSource() == homeButton) {
+                if (ssm != null) {
+                    ssm.disconnect();
+                    ssm = null;
+                }
+
+                playerList.clear();
+                intPlayersConnected = 0;
+                strPlayerColour = null;
+                chooseRole = -1;
+                isServer = false;
+                thePanel.tileHealth = new int[9][16];
+                crumbleTileTimer = new int[9][16];
+                intMapChoice = -1;
+
+                chatArea.setText("");
+                chatInput.setText("");
+                playersConnectedLabel.setText("");
+                joiningIPInfo.setText("");
+                setupErrorLabel.setText("");
+
                 thePanel.intGameState = 0;
             }      
         }
