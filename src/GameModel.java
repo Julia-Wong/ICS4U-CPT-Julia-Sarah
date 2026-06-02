@@ -201,107 +201,107 @@ public class GameModel implements ActionListener, KeyListener {
         }
             
         if (evt.getSource() == theTimer) {
-            Player myPlayer = null;
-            for (Player p: playerList) {
-                if (p.strColour.equals(strPlayerColour)) {
-                    myPlayer = p;
-                    break;
-                }
-            }
-
-            // move players
-                if (myPlayer != null && myPlayer.isAlive) {
-                    int intOldX = myPlayer.intX;
-                    int intOldY = myPlayer.intY;
-
-                    if (myPlayer.upPressed == true) {
-                        myPlayer.intY -= intGameSpeed;
-                    }
-                    if (myPlayer.downPressed == true) {
-                        myPlayer.intY += intGameSpeed;
-                    }
-                    if (myPlayer.rightPressed == true) {
-                        myPlayer.intX += intGameSpeed;
-                    }
-                    if (myPlayer.leftPressed == true) {
-                        myPlayer.intX -= intGameSpeed;
-                    }
-
-                    if (myPlayer.intX != intOldX || myPlayer.intY != intOldY) {
-                        ssm.sendText("move," + strPlayerColour + "," + myPlayer.intX + "," + myPlayer.intY);
+            if (thePanel.intGameState == 4) {
+                Player myPlayer = null;
+                for (Player p: playerList) {
+                    if (p.strColour.equals(strPlayerColour)) {
+                        myPlayer = p;
+                        break;
                     }
                 }
 
-                // check collisions
+                // move players
+                    if (myPlayer != null && myPlayer.isAlive) {
+                        int intOldX = myPlayer.intX;
+                        int intOldY = myPlayer.intY;
 
-                // screen boundaries
-                if (myPlayer.intX < 0) {
-                    myPlayer.intX = 0;
-                }
-                if (myPlayer.intX > 1240) {
-                    myPlayer.intX = 1240;
-                }
-                if (myPlayer.intY < 0) {
-                    myPlayer.intY = 0;
-                }
-                if (myPlayer.intY > 680) {
-                    myPlayer.intY = 680;
-                }
+                        if (myPlayer.upPressed == true) {
+                            myPlayer.intY -= intGameSpeed;
+                        }
+                        if (myPlayer.downPressed == true) {
+                            myPlayer.intY += intGameSpeed;
+                        }
+                        if (myPlayer.rightPressed == true) {
+                            myPlayer.intX += intGameSpeed;
+                        }
+                        if (myPlayer.leftPressed == true) {
+                            myPlayer.intX -= intGameSpeed;
+                        }
 
-                int playerRow = (myPlayer.intY + 20) / 80;
-                int playerCol = (myPlayer.intX + 20) / 80;
-                int currentTileHeatlh = thePanel.tileHealth[playerRow][playerCol];
+                        if (myPlayer.intX != intOldX || myPlayer.intY != intOldY) {
+                            ssm.sendText("move," + strPlayerColour + "," + myPlayer.intX + "," + myPlayer.intY);
+                        }
+                    }
 
-                // check tiles
-                if (currentTileHeatlh == 3) { // check death
-                    myPlayer.isAlive = false;
-                    ssm.sendText("die," + strPlayerColour);
-                } else { // degrade tile
-                    if (playerRow != myPlayer.intCurrentRow || playerCol != myPlayer.intCurrentCol) { // if on new tile
-                        // update player location
-                        myPlayer.intCurrentRow = playerRow;
-                        myPlayer.intCurrentCol = playerCol;
-                        myPlayer.intFramesOnTile = 0;
+                    // check collisions
 
-                        if (thePanel.tileHealth[playerRow][playerCol] < 2) {
-                            // damage tile
-                            thePanel.tileHealth[playerRow][playerCol] += 1;
+                    // screen boundaries
+                    if (myPlayer.intX < 0) {
+                        myPlayer.intX = 0;
+                    }
+                    if (myPlayer.intX > 1240) {
+                        myPlayer.intX = 1240;
+                    }
+                    if (myPlayer.intY < 0) {
+                        myPlayer.intY = 0;
+                    }
+                    if (myPlayer.intY > 680) {
+                        myPlayer.intY = 680;
+                    }
 
-                            // send network message
-                            ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
-                        } else if (thePanel.tileHealth[playerRow][playerCol] == 2) {
-                            if (crumbleTileTimer[playerRow][playerCol] == 0) {
-                                crumbleTileTimer[playerRow][playerCol] = 30;
+                    int playerRow = (myPlayer.intY + 20) / 80;
+                    int playerCol = (myPlayer.intX + 20) / 80;
+                    int currentTileHeatlh = thePanel.tileHealth[playerRow][playerCol];
+
+                    // check tiles
+                    if (currentTileHeatlh == 3) { // check death
+                        myPlayer.isAlive = false;
+                        ssm.sendText("die," + strPlayerColour);
+                    } else { // degrade tile
+                        if (playerRow != myPlayer.intCurrentRow || playerCol != myPlayer.intCurrentCol) { // if on new tile
+                            // update player location
+                            myPlayer.intCurrentRow = playerRow;
+                            myPlayer.intCurrentCol = playerCol;
+                            myPlayer.intFramesOnTile = 0;
+
+                            if (thePanel.tileHealth[playerRow][playerCol] < 2) {
+                                // damage tile
+                                thePanel.tileHealth[playerRow][playerCol] += 1;
+
+                                // send network message
+                                ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
+                            } else if (thePanel.tileHealth[playerRow][playerCol] == 2) {
+                                if (crumbleTileTimer[playerRow][playerCol] == 0) {
+                                    crumbleTileTimer[playerRow][playerCol] = 30;
+                                }
+                            }
+                            
+                        } else { // if standing on same tile
+                            myPlayer.intFramesOnTile += 1;
+                            if (myPlayer.intFramesOnTile >= 30) {
+                                thePanel.tileHealth[playerRow][playerCol] += 1;
+                                myPlayer.intFramesOnTile = 0;
+                                ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
+                            }
+                        }
+
+                    }
+
+                for (int r = 0; r < thePanel.map.length; r++) {
+                    for (int c = 0; c < thePanel.map[r].length; c++) {
+                        if (crumbleTileTimer[r][c] > 0) {
+                            crumbleTileTimer[r][c]--;
+
+                            if (crumbleTileTimer[r][c] == 0) {
+                                thePanel.tileHealth[r][c] = 3;
+                                ssm.sendText("break," + r + "," + c + ",3");
                             }
                         }
                         
-                    } else { // if standing on same tile
-                        myPlayer.intFramesOnTile += 1;
-                        if (myPlayer.intFramesOnTile >= 30) {
-                            thePanel.tileHealth[playerRow][playerCol] += 1;
-                            myPlayer.intFramesOnTile = 0;
-                            ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
-                        }
                     }
-
                 }
 
-            for (int r = 0; r < thePanel.map.length; r++) {
-                for (int c = 0; c < thePanel.map[r].length; c++) {
-                    if (crumbleTileTimer[r][c] > 0) {
-                        crumbleTileTimer[r][c]--;
-
-                        if (crumbleTileTimer[r][c] == 0) {
-                            thePanel.tileHealth[r][c] = 3;
-                            ssm.sendText("break," + r + "," + c + ",3");
-                        }
-                    }
-                    
-                }
-            }
-
-            // check for winner
-            if (thePanel.intGameState == 4) {
+                // check for winner
                 int aliveCount = 0;
                 String winnerName = "";
 
@@ -324,7 +324,9 @@ public class GameModel implements ActionListener, KeyListener {
 
                     showCurrentGUI();
                 }
+                
             }
+
             if (thePanel.intGameState == 6) {
                 Player myPlayerDemo = null;
                 if (!playerList.isEmpty()) {
@@ -625,41 +627,42 @@ public class GameModel implements ActionListener, KeyListener {
             if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
             } 
-            
-            if (evt.getSource() == demoButton || evt.getSource() == demoResetButton) {
-                thePanel.intGameState = 6;
-
-                for (int r = 0; r < 9; r++) {
-                    for (int c = 0; c < 16; c++) {
-                        thePanel.map[r][c] = 0;
-                        thePanel.tileHealth[r][c] = 3;
-                        crumbleTileTimer[r][c] = 0;
-                    }
-                }
-
-                for (int r = 3; r <= 5; r++) {
-                    for (int c = 6; c <= 8; c++) {
-                        thePanel.tileHealth[r][c] = 0;
-                    }
-                }
-
-                playerList.clear();
-                strPlayerColour = "Red";
-                playerList.add(new Player(1, 7*80, 4*80, strPlayerColour));
-
-                theTimer.start();
-                thePanel.repaint();
-
-                thePanel.setFocusable(true);
-                thePanel.requestFocusInWindow();
-
-            } 
-            
-            if (evt.getSource() == demoBackButton) {
-                theTimer.stop();
-                thePanel.intGameState = 2;   
-            }
         }
+            
+        if (evt.getSource() == demoButton || evt.getSource() == demoResetButton) {
+            thePanel.intGameState = 6;
+
+            for (int r = 0; r < 9; r++) {
+                for (int c = 0; c < 16; c++) {
+                    thePanel.map[r][c] = 0;
+                    thePanel.tileHealth[r][c] = 3;
+                    crumbleTileTimer[r][c] = 0;
+                }
+            }
+
+            for (int r = 3; r <= 5; r++) {
+                for (int c = 6; c <= 8; c++) {
+                    thePanel.tileHealth[r][c] = 0;
+                }
+            }
+
+            playerList.clear();
+            strPlayerColour = "Red";
+            playerList.add(new Player(1, 7*80, 4*80, strPlayerColour));
+
+            theTimer.start();
+            thePanel.repaint();
+
+            thePanel.setFocusable(true);
+            thePanel.requestFocusInWindow();
+
+        } 
+        
+        if (evt.getSource() == demoBackButton) {
+            theTimer.stop();
+            thePanel.intGameState = 2;   
+        }
+        
 
         // if on credits screen
         if (thePanel.intGameState == 3) {
