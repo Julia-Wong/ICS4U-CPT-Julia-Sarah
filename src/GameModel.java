@@ -3,108 +3,115 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
-// import javax.swing.event.*;
 
 public class GameModel implements ActionListener, KeyListener {
-    // Properties
+    // === PROPERTIES ===
+
+    // 1. Main Window Properties
     JFrame theFrame = new JFrame("Spleef");
     GameView thePanel = new GameView();
     Timer theTimer = new Timer(1000/60, this);
 
-    // Home Screen
-    //JLabel titleSpleef = new JLabel("Spleef");
+    // 2. Main Menu Components
     JButton lobbyButton = new JButton("Lobby");
     JButton helpButton = new JButton("Help");
     JButton creditsButton = new JButton("Credits");
-
-    // Back Buttons
     JButton backButton = new JButton("← Back");
 
-    // Help Buttons
-    JButton demoButton = new JButton("Demo");
-    JButton demoResetButton = new JButton("Reset Demo");
-    JButton demoBackButton = new JButton("Exit Demo");
-
-    // Lobby Buttons
-    JLabel playersConnectedLabel = new JLabel();
-    JLabel chooseMapLabel = new JLabel("Choose a Map: ");
-    JButton alpineTundraMapButton = new JButton("Alpine Tundra Map"); // snow stone 
-    JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand dirt
-    JButton floatingIslandMapButton = new JButton("Floating Island Map"); // grass dirt sand
-    JButton playButton = new JButton("PLAY");
-    JLabel setupErrorLabel = new JLabel();
-
-    JTextArea chatArea = new JTextArea();
-    JScrollPane scrollChatArea = new JScrollPane(chatArea);
-    JTextField chatInput = new JTextField();
-
-    // Connecting to Host
-    SuperSocketMaster ssm;
-    boolean isServer = false;
-    int chooseRole = -1; // 0=host, 1=player
-    int intGameSpeed = 5;
-    int intGameDifficulty = 2; // 1=easy, 2=medium, 3=hard
-    String strPlayerColour;
-    String strIPAddress;
-
-    // Connecting Pop-up
+    // 3. Network Connection GUI
     JLabel chooseRoleLabel = new JLabel("Choose your network role: ");
     JButton chooseHostButton = new JButton("Host Game");
     JButton chooseJoinButton = new JButton("Join Game");
-    JButton confirmRoleButton = new JButton("Confirm");
 
-    // Host-Specific Difficulty Selectors
-    JLabel chooseDifficultyLabel = new JLabel("Choose game difficulty: ");
-    JButton easyButton = new JButton("Easy");
-    JButton mediumButton = new JButton("Medium");
-    JButton hardButton = new JButton("Hard");
-
-    // Joiner-Specific Color Selectors
     JLabel enterIPAddressLabel = new JLabel("Enter Host's IP Address: ");
     JTextField enterIPAddress = new JTextField();
-    JLabel joiningIPInfo = new JLabel();
+
     JLabel choosePlayerColourLabel = new JLabel("Choose player colour: ");
     JButton redButton = new JButton("Red");
     JButton blueButton = new JButton("Blue");
     JButton greenButton = new JButton("Green");
     JButton purpleButton = new JButton("Purple");
 
-    JButton homeButton = new JButton("Home");
+    JButton confirmRoleButton = new JButton("Confirm");
+    JLabel setupErrorLabel = new JLabel();
+
+    // 4. Host Specific Game Lobby Modifiers
+    JLabel chooseDifficultyLabel = new JLabel("Choose game difficulty: ");
+    JButton easyButton = new JButton("Easy");
+    JButton mediumButton = new JButton("Medium");
+    JButton hardButton = new JButton("Hard");
+
+    // 5. General Lobby Screen Components
+    JLabel playersConnectedLabel = new JLabel();
+    JLabel joiningIPInfo = new JLabel();
+
+    JLabel chooseMapLabel = new JLabel("Choose a Map: ");
+    JButton alpineTundraMapButton = new JButton("Alpine Tundra Map"); // snow stone 
+    JButton oasisDesertMapButton = new JButton("Oasis Desert Map"); // sand dirt
+    JButton floatingIslandMapButton = new JButton("Floating Island Map"); // grass dirt sand
+    JButton playButton = new JButton("PLAY");
+
+    JTextArea chatArea = new JTextArea();
+    JScrollPane scrollChatArea = new JScrollPane(chatArea);
+    JTextField chatInput = new JTextField();
+
+    // 6. Playable DEMO Buttons
+    JButton demoButton = new JButton("Demo");
+    JButton demoResetButton = new JButton("Reset Demo");
+    JButton demoBackButton = new JButton("Exit Demo");
+
+    // 7. Post-Game Layout
     JLabel gameOverLabel = new JLabel("Game Over!");
     JLabel winnerLabel = new JLabel();
+    JButton homeButton = new JButton("Home");
 
-    // Data
+    // 8. Networking Data
+    SuperSocketMaster ssm;
+    boolean isServer = false;
+    int chooseRole = -1; // -1=unassigned, 0=host, 1=player
+    int intGameSpeed = 5;
+    int intGameDifficulty = 2; // 1=easy, 2=medium, 3=hard
+    String strPlayerColour;
+    String strIPAddress;
+
+    // 9. Game Data
     String[] mapFiles = {"alpineTundraMap.csv", "oasisDesertMap.csv", "floatingIslandMap.csv"};
     int intMapChoice = -1;
     int intPlayersConnected = 0;
     ArrayList<Player> playerList = new ArrayList<Player>();
     int[][] crumbleTileTimer = new int[9][16];
 
-    // Methods
+    // === METHODS ===
+
+    /**
+     * Processes all triggers, including network messages, timers, and buttons.
+     * @param evt The ActionEvent captured from a button, network socket, or timer.
+     */
     public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource() == ssm && ssm != null) {
+
+        // 1. Network Receiver
+        if (ssm != null && evt.getSource() == ssm) {
+
             // Read and separate incoming messages
             String incomingMessage = ssm.readText();
             String[] message = incomingMessage.split(",");
             String word = message[0];
 
+            // A new guest joins the server
             if (word.equals("hello")) {
                 intPlayersConnected += 1;
                 String guestColour = message[1];
 
+                // Set spawn points for each player
                 int intSpawnX = 0;
                 int intSpawnY = 0;
-
                 if (intPlayersConnected == 2) {
-                    // Spawn in bottom right
                     intSpawnX = 9 * 80;
                     intSpawnY = 6 * 80;
                 } else if (intPlayersConnected == 3) {
-                    // Spawn in bottom left
                     intSpawnX = 6 * 80;
                     intSpawnY = 6 * 80;
                 } else if (intPlayersConnected == 4) {
-                    // Spawn in top right
                     intSpawnX = 9 * 80;
                     intSpawnY = 2 * 80;
                 }
@@ -116,7 +123,10 @@ public class GameModel implements ActionListener, KeyListener {
                 if (isServer) {
                     ssm.sendText("hostInfo," + intPlayersConnected + "," + strPlayerColour + "," + intMapChoice + "," + intGameSpeed);
                 }
-            } else if (word.equals("hostInfo")) {
+            } 
+
+            // Transfers data from host to the players
+            else if (word.equals("hostInfo")) {
                 intPlayersConnected = Integer.parseInt(message[1]);
                 String hostColour = message[2];
                 int hostMap = Integer.parseInt(message[3]);
@@ -127,30 +137,30 @@ public class GameModel implements ActionListener, KeyListener {
                     loadMap(mapFiles[intMapChoice]);
                 }
 
+                // Lets all players know who the host is
                 playerList.clear();
                 playerList.add(new Player(1, 6 * 80, 2 * 80, hostColour));
 
+                // Sets spawn point for host
                 int intHostSpawnX = 0;
                 int intHostSpawnY = 0;
-
                 if (intPlayersConnected == 2) {
-                    // Spawn in bottom right
                     intHostSpawnX = 9 * 80;
                     intHostSpawnY = 6 * 80;
                 } else if (intPlayersConnected == 3) {
-                    // Spawn in bottom left
                     intHostSpawnX = 6 * 80;
                     intHostSpawnY = 6 * 80;
                 } else if (intPlayersConnected == 4) {
-                    // Spawn in top right
                     intHostSpawnX = 9 * 80;
                     intHostSpawnY = 2 * 80;
                 }
                 
                 playerList.add(new Player(intPlayersConnected, intHostSpawnX, intHostSpawnY, strPlayerColour));
                 playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
-
-            } else if (word.equals("map")) {
+            } 
+            
+            // Transfer host game set up info to players
+            else if (word.equals("map")) {
                 intMapChoice = Integer.parseInt(message[1]);
                 loadMap(mapFiles[intMapChoice]);
                 chatArea.append("[SYSTEM] Host changed map to option " + intMapChoice + "\n");
@@ -158,14 +168,19 @@ public class GameModel implements ActionListener, KeyListener {
                 thePanel.intGameState = 4;
                 chatArea.append("[SYSTEM] Game starting!\n");
                 theTimer.start();
-
                 thePanel.setFocusable(true);
                 thePanel.requestFocusInWindow();
-            } else if (word.equals("chat")) {
+            } 
+            
+            // Texting over network
+            else if (word.equals("chat")) {
                 if (message.length >= 3) {
                     chatArea.append("[" + message[1] + "] " + message[2] + "\n");
                 }
-            } else if (word.equals("move")) {
+            } 
+            
+            // Game mechanics shared over network
+            else if (word.equals("move")) {
                 String movingPlayerColour = message[1];
                 int newX = Integer.parseInt(message[2]);
                 int newY = Integer.parseInt(message[3]);
@@ -178,15 +193,14 @@ public class GameModel implements ActionListener, KeyListener {
                     }
                 }
             } else if (word.equals("break")) {
-                // update tile health
+                // Update tile health
                 int row = Integer.parseInt(message[1]);
                 int col = Integer.parseInt(message[2]);
                 int newHealth = Integer.parseInt(message[3]);
-
                 thePanel.tileHealth[row][col] = newHealth;
             } else if (word.equals("die")) {
+                // Remove players from game when they die
                 String playerDead = message[1];
-
                 for (Player p: playerList) {
                     if (p.strColour.equals(playerDead)) {
                         p.isAlive = false;
@@ -197,11 +211,14 @@ public class GameModel implements ActionListener, KeyListener {
 
             showCurrentGUI();
             return;
-
         }
             
+        // 2. Game Timer
         if (evt.getSource() == theTimer) {
+            
+            // During multiplayer game
             if (thePanel.intGameState == 4) {
+                // Determine which player object is their character
                 Player myPlayer = null;
                 for (Player p: playerList) {
                     if (p.strColour.equals(strPlayerColour)) {
@@ -210,32 +227,31 @@ public class GameModel implements ActionListener, KeyListener {
                     }
                 }
 
-                // move players
-                    if (myPlayer != null && myPlayer.isAlive) {
-                        int intOldX = myPlayer.intX;
-                        int intOldY = myPlayer.intY;
+                // Move player
+                if (myPlayer != null && myPlayer.isAlive) {
+                    int intOldX = myPlayer.intX;
+                    int intOldY = myPlayer.intY;
 
-                        if (myPlayer.upPressed == true) {
-                            myPlayer.intY -= intGameSpeed;
-                        }
-                        if (myPlayer.downPressed == true) {
-                            myPlayer.intY += intGameSpeed;
-                        }
-                        if (myPlayer.rightPressed == true) {
-                            myPlayer.intX += intGameSpeed;
-                        }
-                        if (myPlayer.leftPressed == true) {
-                            myPlayer.intX -= intGameSpeed;
-                        }
-
-                        if (myPlayer.intX != intOldX || myPlayer.intY != intOldY) {
-                            ssm.sendText("move," + strPlayerColour + "," + myPlayer.intX + "," + myPlayer.intY);
-                        }
+                    if (myPlayer.upPressed == true) {
+                        myPlayer.intY -= intGameSpeed;
+                    }
+                    if (myPlayer.downPressed == true) {
+                        myPlayer.intY += intGameSpeed;
+                    }
+                    if (myPlayer.rightPressed == true) {
+                        myPlayer.intX += intGameSpeed;
+                    }
+                    if (myPlayer.leftPressed == true) {
+                        myPlayer.intX -= intGameSpeed;
                     }
 
-                    // check collisions
+                    if (myPlayer.intX != intOldX || myPlayer.intY != intOldY) {
+                        ssm.sendText("move," + strPlayerColour + "," + myPlayer.intX + "," + myPlayer.intY);
+                    }
+                }
 
-                    // screen boundaries
+                // Screen boundaries
+                if (myPlayer != null) {
                     if (myPlayer.intX < 0) {
                         myPlayer.intX = 0;
                     }
@@ -249,34 +265,34 @@ public class GameModel implements ActionListener, KeyListener {
                         myPlayer.intY = 680;
                     }
 
+                    // Determine where players are
                     int playerRow = (myPlayer.intY + 20) / 80;
                     int playerCol = (myPlayer.intX + 20) / 80;
-                    int currentTileHeatlh = thePanel.tileHealth[playerRow][playerCol];
+                    int currentTileHealth = thePanel.tileHealth[playerRow][playerCol];
 
-                    // check tiles
-                    if (currentTileHeatlh == 3) { // check death
+                    // Process player contact with tiles
+                    if (currentTileHealth == 3) { // Check death
                         myPlayer.isAlive = false;
                         ssm.sendText("die," + strPlayerColour);
-                    } else { // degrade tile
-                        if (playerRow != myPlayer.intCurrentRow || playerCol != myPlayer.intCurrentCol) { // if on new tile
-                            // update player location
+                    } else { // Check tile
+                        // If on new tile
+                        if (playerRow != myPlayer.intCurrentRow || playerCol != myPlayer.intCurrentCol) { 
                             myPlayer.intCurrentRow = playerRow;
                             myPlayer.intCurrentCol = playerCol;
                             myPlayer.intFramesOnTile = 0;
 
-                            if (thePanel.tileHealth[playerRow][playerCol] < 2) {
-                                // damage tile
+                            if (thePanel.tileHealth[playerRow][playerCol] < 2) { // Damage Tile
                                 thePanel.tileHealth[playerRow][playerCol] += 1;
-
-                                // send network message
                                 ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
-                            } else if (thePanel.tileHealth[playerRow][playerCol] == 2) {
+                            } else if (thePanel.tileHealth[playerRow][playerCol] == 2) { // Set off crumble timer
                                 if (crumbleTileTimer[playerRow][playerCol] == 0) {
                                     crumbleTileTimer[playerRow][playerCol] = 30;
                                 }
                             }
-                            
-                        } else { // if standing on same tile
+                        } 
+
+                        // If standing on same tile
+                        else { 
                             myPlayer.intFramesOnTile += 1;
                             if (myPlayer.intFramesOnTile >= 30) {
                                 thePanel.tileHealth[playerRow][playerCol] += 1;
@@ -284,9 +300,11 @@ public class GameModel implements ActionListener, KeyListener {
                                 ssm.sendText("break," + playerRow + "," + playerCol + "," + thePanel.tileHealth[playerRow][playerCol]);
                             }
                         }
-
                     }
+                }
+                
 
+                // Decrement tile for crumbling effect
                 for (int r = 0; r < thePanel.map.length; r++) {
                     for (int c = 0; c < thePanel.map[r].length; c++) {
                         if (crumbleTileTimer[r][c] > 0) {
@@ -297,14 +315,12 @@ public class GameModel implements ActionListener, KeyListener {
                                 ssm.sendText("break," + r + "," + c + ",3");
                             }
                         }
-                        
                     }
                 }
 
-                // check for winner
+                // Check for winner
                 int aliveCount = 0;
                 String winnerName = "";
-
                 for (Player p: playerList) {
                     if (p.isAlive) {
                         aliveCount++;
@@ -324,9 +340,9 @@ public class GameModel implements ActionListener, KeyListener {
 
                     showCurrentGUI();
                 }
-                
             }
 
+            // If on DEMO screen
             if (thePanel.intGameState == 6) {
                 Player myPlayerDemo = null;
                 if (!playerList.isEmpty()) {
@@ -364,22 +380,22 @@ public class GameModel implements ActionListener, KeyListener {
                 int playerRowDemo = (myPlayerDemo.intY + 20)/80;
                 int playerColDemo = (myPlayerDemo.intX + 20)/80;
 
-                if (thePanel.tileHealth[playerRowDemo][playerColDemo] == 3) {
+                if (thePanel.tileHealth[playerRowDemo][playerColDemo] == 3) { // Check death
                     myPlayerDemo.isAlive = false;
-                } else {
-                    if (playerRowDemo != myPlayerDemo.intCurrentRow || playerColDemo != myPlayerDemo.intCurrentCol) {
+                } else { // Check tiles
+                    if (playerRowDemo != myPlayerDemo.intCurrentRow || playerColDemo != myPlayerDemo.intCurrentCol) { // Moved to new tile
                         myPlayerDemo.intCurrentRow = playerRowDemo;
                         myPlayerDemo.intCurrentCol = playerColDemo;
                         myPlayerDemo.intFramesOnTile = 0;
 
-                        if (thePanel.tileHealth[playerRowDemo][playerColDemo] < 2) {
+                        if (thePanel.tileHealth[playerRowDemo][playerColDemo] < 2) { // Damage tile
                             thePanel.tileHealth[playerRowDemo][playerColDemo] += 1;
-                        } else if (thePanel.tileHealth[playerRowDemo][playerColDemo] == 2) {
+                        } else if (thePanel.tileHealth[playerRowDemo][playerColDemo] == 2) { // Start crumble timer
                             if (crumbleTileTimer[playerRowDemo][playerColDemo] == 0) {
                                 crumbleTileTimer[playerRowDemo][playerColDemo] = 30;
                             }
                         }
-                    } else {
+                    } else { // Stayed on same tile
                         myPlayerDemo.intFramesOnTile += 1;
                         if (myPlayerDemo.intFramesOnTile >= 30) {
                             thePanel.tileHealth[playerRowDemo][playerColDemo] += 1;
@@ -389,7 +405,7 @@ public class GameModel implements ActionListener, KeyListener {
                 }
             }
 
-            // Countdown
+            // Countdown for crumble timer
             for (int r = 0; r < 9; r++) {
                 for (int c = 0; c < 16; c++) {
                     if (crumbleTileTimer[r][c] > 0) {
@@ -402,12 +418,11 @@ public class GameModel implements ActionListener, KeyListener {
                 }
             }
             showCurrentGUI();
-
             thePanel.repaint();
             return;
         }
 
-        // if on homescreen
+        // 3. Home Screen
         if (thePanel.intGameState == 0) {
             if (evt.getSource() == lobbyButton) {
                 thePanel.intGameState = 1;
@@ -420,10 +435,11 @@ public class GameModel implements ActionListener, KeyListener {
             }
         }
 
-        // if on lobby screen
+        // 4. Lobby Screen
         if (thePanel.intGameState == 1) {
             if (evt.getSource() == backButton) {
-               if (ssm != null) {
+                // Disconnect from lobby
+                if (ssm != null) {
                     ssm.disconnect();
                     ssm = null;
                 }
@@ -442,9 +458,11 @@ public class GameModel implements ActionListener, KeyListener {
                 playersConnectedLabel.setText("");
                 joiningIPInfo.setText("");
                 setupErrorLabel.setText("");
-
                 thePanel.intGameState = 0;
-            } else if (evt.getSource() == alpineTundraMapButton) {
+            } 
+            
+            // Load maps
+            else if (evt.getSource() == alpineTundraMapButton) {
                 intMapChoice = 0;
                 loadMap(mapFiles[intMapChoice]);
                 chatArea.append("[LOBBY] Map chosen: ALPINE TUNDRA\n");
@@ -465,10 +483,13 @@ public class GameModel implements ActionListener, KeyListener {
                 if (isServer) {
                     ssm.sendText("map,2");
                 }
-            } else if (evt.getSource() == playButton) {
-                boolean hasDuplicateColours = false;
+            } 
+            
+            // Start Game
+            else if (evt.getSource() == playButton) {
 
-                // go compare all player colours to one another
+                // Compares player colours to one another
+                boolean hasDuplicateColours = false;
                 for (int i = 0; i < playerList.size(); i++) {
                     for (int j = i + 1; j < playerList.size(); j++) {
                         if (playerList.get(i).strColour.equals(playerList.get(j).strColour)) {
@@ -477,7 +498,7 @@ public class GameModel implements ActionListener, KeyListener {
                     }
                 }
 
-                // check all rules before playing
+                // Check all rules before playing
                 if (intMapChoice == -1) {
                     chatArea.append("[SYSTEM] Please select a map first!\n");
                 } else if (playerList.size() < 2) {
@@ -493,16 +514,21 @@ public class GameModel implements ActionListener, KeyListener {
                     }
                     theTimer.start();
                     thePanel.repaint();
-
                     thePanel.setFocusable(true);
                     thePanel.requestFocusInWindow();
                 }
                 
-            } else if (evt.getSource() == chooseHostButton) {
+            } 
+            
+            // Set up screen elements
+            else if (evt.getSource() == chooseHostButton) {
                 chooseRole = 0;
             } else if (evt.getSource() == chooseJoinButton) {
                 chooseRole = 1;
-            } else if (evt.getSource() == confirmRoleButton) {
+            } 
+            
+            // Connect to server
+            else if (evt.getSource() == confirmRoleButton) {
                 if (chooseRole == -1) {
                     setupErrorLabel.setText("Please select Host or Join first!");
                     return;
@@ -515,8 +541,8 @@ public class GameModel implements ActionListener, KeyListener {
 
                 thePanel.choosingNetworkRole = false;
 
+                // Chose Host
                 if (chooseRole == 0) {
-                    // HOST MODE
                     isServer = true;
                     ssm = new SuperSocketMaster(1337, this);
                     ssm.connect();
@@ -525,17 +551,15 @@ public class GameModel implements ActionListener, KeyListener {
                     joiningIPInfo.setText("Hosting! Tell Guest IP: " + myRealIP);
                     chatArea.append("[SYSTEM] Server started! Waiting for players...\n");
 
-                    // Add in host player
                     intPlayersConnected += 1;
-                    //int randomX = (int)(Math.random() * 1280) + 1; 
-                    //int randomY = (int)(Math.random() * 720) + 1;
-                    
                     playerList.add(new Player(intPlayersConnected, 6 * 80, 2 * 80, strPlayerColour));
                     playersConnectedLabel.setText(intPlayersConnected + " Player(s) Connected");
                     setupErrorLabel.setText("");
 
-                } else if (chooseRole == 1) {
-                    // JOIN MODE
+                } 
+                
+                // Chose Joiner
+                else if (chooseRole == 1) {
                     isServer = false;
                     strIPAddress = enterIPAddress.getText();
 
@@ -546,20 +570,21 @@ public class GameModel implements ActionListener, KeyListener {
                     ssm = new SuperSocketMaster(strIPAddress, 1337, this);
                     boolean connected = ssm.connect();
 
-                    // If connected sucessfully
                     if (connected == true){
                         chatArea.append("[SYSTEM] Connected to server...\n");
 
                         ssm.sendText("hello," + strPlayerColour);
                         setupErrorLabel.setText("");
-                    // If failed to connect
                     } else {
                         chatArea.append("[SYSTEM] Failed to connect to server. Please check the IP address and try again.\n");
                         ssm = null;
                         thePanel.choosingNetworkRole = true;
                     }
                 }
-            } else if (evt.getSource() == easyButton) {
+            } 
+            
+            // Game Difficulty Buttons
+            else if (evt.getSource() == easyButton) {
                 intGameDifficulty = 1;
                 intGameSpeed = 3;
                 chatArea.append("[SYSTEM] Game Difficulty set to: EASY (Speed: Slow)\n");
@@ -571,7 +596,10 @@ public class GameModel implements ActionListener, KeyListener {
                 intGameDifficulty = 3;
                 intGameSpeed = 7;
                 chatArea.append("[SYSTEM] Game Difficulty set to: HARD (Speed: Fast!)\n");
-            } else if (evt.getSource() == redButton) {
+            } 
+            
+            // Character Colour Buttons
+            else if (evt.getSource() == redButton) {
                 strPlayerColour = "Red";
                 chatArea.append("[LOBBY] Player color set to: RED\n");
             } else if (evt.getSource() == blueButton) {
@@ -583,10 +611,15 @@ public class GameModel implements ActionListener, KeyListener {
             } else if (evt.getSource() == purpleButton) {
                 strPlayerColour = "Purple";
                 chatArea.append("[LOBBY] Player color set to: PURPLE\n");
-            } else if (evt.getSource() == enterIPAddress) {
+            } 
+            
+            // Enter IP Address
+            else if (evt.getSource() == enterIPAddress) {
                 strIPAddress = enterIPAddress.getText();
-            } else if (evt.getSource() == chatInput){
-                // Chat Messages
+            } 
+            
+            // Network Chat Messages
+            else if (evt.getSource() == chatInput){
                 String chatMessage = chatInput.getText();
 
                 if (chatMessage != null && !chatMessage.trim().equals("")) {
@@ -597,12 +630,11 @@ public class GameModel implements ActionListener, KeyListener {
                     } else {
                         chatArea.append("[SYSTEM] You are not connected yet! Please connect first.\n");
                     }
-                   
                 }
             } 
             
-            // Bold Map if Chosen
-            if (intMapChoice == 0) { // Bold Apline Tundra
+            // Highlight Chosen Map
+            if (intMapChoice == 0) { // Bold Alpine Tundra
                 alpineTundraMapButton.setText("★ ALPINE TUNDRA ★");
             } else {
                 alpineTundraMapButton.setText("Alpine Tundra Map");
@@ -619,20 +651,21 @@ public class GameModel implements ActionListener, KeyListener {
             } else {
                 floatingIslandMapButton.setText("Floating Island Map");
             }
-
         }
 
-        // if on help screen
+        // 5. Help Screen
         if (thePanel.intGameState == 2) {
             if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
                 playerList.clear();
             } 
         }
-            
+           
+        // 6. Demo Game
         if (evt.getSource() == demoButton || evt.getSource() == demoResetButton) {
             thePanel.intGameState = 6;
 
+            // Create a demo 3x3 grid
             for (int r = 0; r < 9; r++) {
                 for (int c = 0; c < 16; c++) {
                     thePanel.map[r][c] = 0;
@@ -653,10 +686,8 @@ public class GameModel implements ActionListener, KeyListener {
 
             theTimer.start();
             thePanel.repaint();
-
             thePanel.setFocusable(true);
             thePanel.requestFocusInWindow();
-
         } 
         
         if (evt.getSource() == demoBackButton) {
@@ -664,22 +695,23 @@ public class GameModel implements ActionListener, KeyListener {
             thePanel.intGameState = 2;   
         }
         
-
-        // if on credits screen
+        // 7. Credits Screen
         if (thePanel.intGameState == 3) {
             if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
             }
         }
 
-        // if on end screen
+        // 8. End Screen
         if (thePanel.intGameState == 5) {
             if (evt.getSource() == homeButton) {
+                // Leave game
                 if (ssm != null) {
                     ssm.disconnect();
                     ssm = null;
                 }
 
+                // Clear memory & reset game for the next play
                 playerList.clear();
                 intPlayersConnected = 0;
                 strPlayerColour = null;
@@ -698,19 +730,30 @@ public class GameModel implements ActionListener, KeyListener {
                 thePanel.intGameState = 0;
             }      
         }
-
+        
         showCurrentGUI();
     }   
 
+    /**
+     * Required by KeyListener interface. Invoked when a key has been
+     * typed, resulting in an outputted code of characters.
+     * @param evt The KeyEvent containing the character data.
+     */
     public void keyTyped(KeyEvent evt) {
-
+        // Intentionally left blank
     }
 
+    /**
+     * Invoked when a key is pressed, initiating player movement.
+     * @param evt The KeyEvent tracking which key was pressed.
+     */
     public void keyPressed(KeyEvent evt) {
+        // Only move characters if they are currently playing
         if (thePanel.intGameState != 4 && thePanel.intGameState != 6) {
             return;
         }
         
+        // Determine which player object is the users
         Player myPlayer = null;
         for (Player p: playerList) {
             if (p.strColour.equals(strPlayerColour)) {
@@ -723,6 +766,7 @@ public class GameModel implements ActionListener, KeyListener {
             return;
         }
 
+        // Flag directions the player is trying to move
         if (evt.getKeyChar() == 'w' || evt.getKeyChar() == 'W') {
             myPlayer.upPressed = true;
         } else if (evt.getKeyChar() == 's' || evt.getKeyChar() == 'S') {
@@ -734,6 +778,10 @@ public class GameModel implements ActionListener, KeyListener {
         }
     }
 
+    /**
+     * Invoked when a key is released, which halts player movement.
+     * @param evt The KeyEvent tracking which key was released.
+     */
     public void keyReleased(KeyEvent evt) {
         if (thePanel.intGameState != 4 && thePanel.intGameState != 6) {
             return;
@@ -751,6 +799,7 @@ public class GameModel implements ActionListener, KeyListener {
             return;
         }
 
+        // Turn off direction booleans for movement
         if (evt.getKeyChar() == 'w' || evt.getKeyChar() == 'W') {
             myPlayer.upPressed = false;
         } else if (evt.getKeyChar() == 's' || evt.getKeyChar() == 'S') {
@@ -762,6 +811,12 @@ public class GameModel implements ActionListener, KeyListener {
         }
     }
 
+    /**
+     * Reads a CSV file to create a 2D map grid array.
+     * Parses through integer tile IDs to construct the game's arena floor
+     * while catching all possible errors.
+     * @param fileName The name of the target map data file.
+     */
     public void loadMap(String fileName) {
         BufferedReader mapFile = null;
         try {
@@ -769,6 +824,7 @@ public class GameModel implements ActionListener, KeyListener {
             String mapLine;
             String[] mapSplit;
 
+            // Goes through the 2D array to create the map
             for (int r = 0; r < thePanel.map.length; r++) {
                 mapLine = mapFile.readLine();
                 mapSplit = mapLine.split(",");
@@ -785,20 +841,14 @@ public class GameModel implements ActionListener, KeyListener {
         }
     }
 
-    // Constructor
+    // === CONSTRUCTOR ===
     public GameModel(){
-        // Set Panel
+        // 1. Game Setup
         thePanel.setLayout(null);
         thePanel.setPreferredSize(new Dimension(1280, 720));
-
-        // Key Listener
         thePanel.addKeyListener(this);
 
-        // Add Title
-        //titleSpleef.setBounds(500, 100, 400, 100);
-        //thePanel.add(titleSpleef);
-
-        // Add Homescreen Buttons
+        // 2. Home Screen GUI
         lobbyButton.setBounds(465, 325, 350, 95);
         lobbyButton.addActionListener(this);
         thePanel.add(lobbyButton);
@@ -811,7 +861,12 @@ public class GameModel implements ActionListener, KeyListener {
         creditsButton.addActionListener(this);
         thePanel.add(creditsButton);
 
-        // Add Help Buttons
+        // 3. Navigation Buttons
+        backButton.setBounds(10, 10, 80, 40);
+        backButton.addActionListener(this);
+        thePanel.add(backButton);
+
+        // 4. Tutorial/DEMO
         demoButton.setBounds(765, 655, 50, 55);
         demoButton.addActionListener(this);
         thePanel.add(demoButton);
@@ -824,48 +879,7 @@ public class GameModel implements ActionListener, KeyListener {
         demoBackButton.addActionListener(this);
         thePanel.add(demoBackButton);
 
-        // Add Back Button
-        backButton.setBounds(10, 10, 80, 40);
-        backButton.addActionListener(this);
-        thePanel.add(backButton);
-
-        // Add Lobby Map Options
-        alpineTundraMapButton.setBounds(100, 500, 300, 100);
-        alpineTundraMapButton.addActionListener(this);
-        thePanel.add(alpineTundraMapButton);
-
-        oasisDesertMapButton.setBounds(400, 500, 300, 100);
-        oasisDesertMapButton.addActionListener(this);
-        thePanel.add(oasisDesertMapButton);
-
-        floatingIslandMapButton.setBounds(700, 500, 300, 100);
-        floatingIslandMapButton.addActionListener(this);
-        thePanel.add(floatingIslandMapButton);
-
-        // Add Lobby Labels
-        playersConnectedLabel.setBounds(500, 200, 400, 100);
-        thePanel.add(playersConnectedLabel);
-
-        chooseMapLabel.setBounds(500, 400, 400, 100);
-        thePanel.add(chooseMapLabel);
-
-        // Add Play Button
-        playButton.setBounds(500, 600, 400, 100);
-        playButton.addActionListener(this);
-        thePanel.add(playButton);
-
-        setupErrorLabel.setBounds(20, 600, 400, 50);
-        thePanel.add(setupErrorLabel);
-
-        // Add Chat
-        scrollChatArea.setBounds(950, 0, 330, 150);
-        thePanel.add(scrollChatArea);
-
-        chatInput.setBounds(950, 150, 330, 50);
-        chatInput.addActionListener(this);
-        thePanel.add(chatInput);
-
-        // Add Connect Pop-up Panel
+        // 5. Game Setup: Choose Role
         chooseRoleLabel.setBounds(420, 220, 400, 50);
         thePanel.add(chooseRoleLabel);
 
@@ -877,23 +891,7 @@ public class GameModel implements ActionListener, KeyListener {
         chooseJoinButton.addActionListener(this);
         thePanel.add(chooseJoinButton);
 
-        // Host Specific Options
-        chooseDifficultyLabel.setBounds(420, 500, 400, 50);
-        thePanel.add(chooseDifficultyLabel);
-
-        easyButton.setBounds(350, 550, 100, 100);
-        easyButton.addActionListener(this);
-        thePanel.add(easyButton);
-
-        mediumButton.setBounds(450, 550, 100, 100);
-        mediumButton.addActionListener(this);
-        thePanel.add(mediumButton);
-
-        hardButton.setBounds(550, 550, 100, 100);
-        hardButton.addActionListener(this);
-        thePanel.add(hardButton);
-
-        // Player Specific Optoins
+        // 6. Game Setup: Enter IP Address
         enterIPAddressLabel.setBounds(420, 300, 400, 50);
         thePanel.add(enterIPAddressLabel);
 
@@ -901,9 +899,7 @@ public class GameModel implements ActionListener, KeyListener {
         enterIPAddress.addActionListener(this);
         thePanel.add(enterIPAddress);
 
-        joiningIPInfo.setBounds(600, 400, 500, 50);
-        thePanel.add(joiningIPInfo);
-        
+        // 7. Game Setup: Choose Player Colour
         choosePlayerColourLabel.setBounds(420, 400, 400, 50);
         thePanel.add(choosePlayerColourLabel);
 
@@ -928,11 +924,67 @@ public class GameModel implements ActionListener, KeyListener {
         purpleButton.addActionListener(this);
         thePanel.add(purpleButton);
 
+        // 8. Game Setup: Confirm Role
         confirmRoleButton.setBounds(700, 650, 100, 50);
         confirmRoleButton.addActionListener(this);
         thePanel.add(confirmRoleButton);
 
-        // game over screen GUI
+        setupErrorLabel.setBounds(20, 600, 400, 50);
+        thePanel.add(setupErrorLabel);
+
+        // 9. Host-Specific Game Settings: Difficulty Level
+        chooseDifficultyLabel.setBounds(420, 500, 400, 50);
+        thePanel.add(chooseDifficultyLabel);
+
+        easyButton.setBounds(350, 550, 100, 100);
+        easyButton.addActionListener(this);
+        thePanel.add(easyButton);
+
+        mediumButton.setBounds(450, 550, 100, 100);
+        mediumButton.addActionListener(this);
+        thePanel.add(mediumButton);
+
+        hardButton.setBounds(550, 550, 100, 100);
+        hardButton.addActionListener(this);
+        thePanel.add(hardButton);
+
+        // 10. Host-Specific Game Settings: Map Choice
+        chooseMapLabel.setBounds(500, 400, 400, 100);
+        thePanel.add(chooseMapLabel);
+
+        alpineTundraMapButton.setBounds(100, 500, 300, 100);
+        alpineTundraMapButton.addActionListener(this);
+        thePanel.add(alpineTundraMapButton);
+
+        oasisDesertMapButton.setBounds(400, 500, 300, 100);
+        oasisDesertMapButton.addActionListener(this);
+        thePanel.add(oasisDesertMapButton);
+
+        floatingIslandMapButton.setBounds(700, 500, 300, 100);
+        floatingIslandMapButton.addActionListener(this);
+        thePanel.add(floatingIslandMapButton);
+
+        // 11. Host-Specific Game Settings: Play
+        playButton.setBounds(500, 600, 400, 100);
+        playButton.addActionListener(this);
+        thePanel.add(playButton);
+
+        // 12. Main Multiplayer Lobby GUI
+        playersConnectedLabel.setBounds(500, 200, 400, 100);
+        thePanel.add(playersConnectedLabel);
+
+        joiningIPInfo.setBounds(600, 400, 500, 50);
+        thePanel.add(joiningIPInfo);
+
+        // 13. Lobby Chat
+        scrollChatArea.setBounds(950, 0, 330, 150);
+        thePanel.add(scrollChatArea);
+
+        chatInput.setBounds(950, 150, 330, 50);
+        chatInput.addActionListener(this);
+        thePanel.add(chatInput);
+
+        // 14. Game Over Layout
         gameOverLabel.setBounds(300, 200, 400, 50);
         thePanel.add(gameOverLabel);
 
@@ -943,93 +995,101 @@ public class GameModel implements ActionListener, KeyListener {
         homeButton.addActionListener(this);
         thePanel.add(homeButton);
 
+        // 15. Desktop Window Initialization
         showCurrentGUI();
 
-        // Set Frame
         theFrame.setContentPane(thePanel);
         theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         theFrame.pack();
         theFrame.setVisible(true);
     }
 
+    /**
+     * Manages GUI visibility based on current state.
+     */
     public void showCurrentGUI() {
+        // 1. Declare All Game States & Sync Players
         boolean isHome = thePanel.intGameState == 0;
+
         boolean isLobby = thePanel.intGameState == 1;
+        boolean isLobbySetup = isLobby && thePanel.choosingNetworkRole;
+        boolean isLobbySetupHost = isLobbySetup && chooseRole == 0;
+        boolean isLobbySetupJoiner = isLobbySetup && chooseRole == 1;
+        boolean isLobbySetupGeneral = isLobbySetup && chooseRole != -1;
+
+        boolean isLobbyGeneral = isLobby && !thePanel.choosingNetworkRole;
+        boolean isLobbyHost = isLobbyGeneral && chooseRole == 0;
+
+
         boolean isHelp = thePanel.intGameState == 2;
+
         boolean isCredits = thePanel.intGameState == 3;
+
         boolean isEndScreen = thePanel.intGameState == 5;
+
         boolean isDemo = thePanel.intGameState == 6;
+        boolean playerIsDead = playerList.isEmpty() || !playerList.get(0).isAlive;
 
         thePanel.currentPlayers = this.playerList;
         thePanel.repaint();
 
-        // draw shared J Components
-        backButton.setVisible(isLobby || isHelp || isCredits);
-        //titleSpleef.setVisible(isHome || isLobby);
-
-        // if on home screen:
+        // 2. Home Screen
         lobbyButton.setVisible(isHome);
         helpButton.setVisible(isHome);
         creditsButton.setVisible(isHome);
+        backButton.setVisible(isLobby || isHelp || isCredits);
 
-        // if on lobby screen:
-        // choosing host or player
-        chooseRoleLabel.setVisible(isLobby && thePanel.choosingNetworkRole);
-        chooseHostButton.setVisible(isLobby && thePanel.choosingNetworkRole);
-        chooseJoinButton.setVisible(isLobby && thePanel.choosingNetworkRole);
+        // 3. Lobby Setup: Choose Role
+        chooseRoleLabel.setVisible(isLobbySetup);
+        chooseHostButton.setVisible(isLobbySetup);
+        chooseJoinButton.setVisible(isLobbySetup);
 
-        // chose host
-        chooseDifficultyLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
-        easyButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
-        mediumButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
-        hardButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 0);
+        // 4. Lobby Setup: Host Role
+        chooseDifficultyLabel.setVisible(isLobbySetupHost);
+        easyButton.setVisible(isLobbySetupHost);
+        mediumButton.setVisible(isLobbySetupHost);
+        hardButton.setVisible(isLobbySetupHost);
 
-        // chose player
-        enterIPAddressLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
-        enterIPAddress.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole == 1);
+        // 5. Lobby Setup: Joiner Role
+        enterIPAddressLabel.setVisible(isLobbySetupJoiner);
+        enterIPAddress.setVisible(isLobbySetupJoiner);
 
-        choosePlayerColourLabel.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
-        redButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
-        blueButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
-        greenButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
-        purpleButton.setVisible(isLobby && thePanel.choosingNetworkRole && chooseRole != -1);
+        // 6. Lobby Setup: General GUI
+        choosePlayerColourLabel.setVisible(isLobbySetupGeneral);
+        redButton.setVisible(isLobbySetupGeneral);
+        blueButton.setVisible(isLobbySetupGeneral);
+        greenButton.setVisible(isLobbySetupGeneral);
+        purpleButton.setVisible(isLobbySetupGeneral);
 
-        // confirm
-        confirmRoleButton.setVisible(isLobby & thePanel.choosingNetworkRole);
-        setupErrorLabel.setVisible(isLobby && thePanel.choosingNetworkRole);
+        confirmRoleButton.setVisible(isLobbySetup);
+        setupErrorLabel.setVisible(isLobbySetup);
 
-        // real lobby
-        joiningIPInfo.setVisible(isLobby && !thePanel.choosingNetworkRole && chooseRole == 0);
-        playersConnectedLabel.setVisible(isLobby && !thePanel.choosingNetworkRole);
-        scrollChatArea.setVisible(isLobby && !thePanel.choosingNetworkRole);
-        chatInput.setVisible(isLobby && !thePanel.choosingNetworkRole);
+        // 7. Lobby: General GUI
+        playersConnectedLabel.setVisible(isLobbyGeneral);
+        scrollChatArea.setVisible(isLobbyGeneral);
+        chatInput.setVisible(isLobbyGeneral);
 
-        chooseMapLabel.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
-        alpineTundraMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
-        oasisDesertMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
-        floatingIslandMapButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
-        playButton.setVisible(isLobby && !thePanel.choosingNetworkRole && isServer);
-        
+        // 8. Lobby: Host GUI
+        joiningIPInfo.setVisible(isLobbyHost);
+        chooseMapLabel.setVisible(isLobbyHost);
+        alpineTundraMapButton.setVisible(isLobbyHost);
+        oasisDesertMapButton.setVisible(isLobbyHost);
+        floatingIslandMapButton.setVisible(isLobbyHost);
+        playButton.setVisible(isLobbyHost);
 
-        // if on help screen:
+        // 9. DEMO Screen
         demoButton.setVisible(isHelp);
         demoBackButton.setVisible(isDemo);
-
-        boolean playerIsDead = playerList.isEmpty() || !playerList.get(0).isAlive;
         demoResetButton.setVisible(isDemo && playerIsDead);
 
-        // if on credits screen:
-
-
-        // if on end screen
+        // 10. Game Over Screen
         gameOverLabel.setVisible(isEndScreen);
         winnerLabel.setVisible(isEndScreen);
         homeButton.setVisible(isEndScreen);
     }
 
-    // Main Program
+    // === MAIN PROGRAM ===
     public static void main(String[] args) {
         new GameModel();
     }
-
 }

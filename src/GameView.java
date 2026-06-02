@@ -1,21 +1,21 @@
 import java.awt.*;
 import javax.swing.*;
 import java.awt.image.*;
-// import java.awt.event.*;
 import java.io.*;
-// import javax.swing.event.*;
 import javax.imageio.*;
 import java.util.ArrayList;
 
-
 public class GameView extends JPanel { 
-    // Properties
-    int intGameState = 0; // 0=home, 1=lobby, 2=help, 3=credits, 4=play, 5=gameover
-    int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
-    int[][] tileHealth = new int[9][16]; // 0=full, 1=slightly cracked, 2=cracked, 3=air
-    ArrayList<Player> currentPlayers = new ArrayList<Player>();
+    // === PROPERTIES ===
 
-    // load tile images
+    // 1. Game Data
+    int intGameState = 0; // 0=home, 1=lobby, 2=help, 3=credits, 4=play, 5=gameover, 6=demo
+    int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
+    int[][] tileHealth = new int[9][16]; // 0=full, 1=slightly cracked, 2=cracked, 3=air(void)
+    ArrayList<Player> currentPlayers = new ArrayList<Player>();
+    boolean choosingNetworkRole = false;
+
+    // 2. Load Tile Graphics
     BufferedImage imgSnowFull = null;
     BufferedImage imgSnowSlightlyCracked = null;
     BufferedImage imgSnowCracked = null;
@@ -36,20 +36,18 @@ public class GameView extends JPanel {
     BufferedImage imgSandSlightlyCracked = null;
     BufferedImage imgSandCracked = null;
 
-    // load player images
+    // 3. Load Player Graphics
     BufferedImage imgPlayerRed = null;
     BufferedImage imgPlayerBlue = null;
     BufferedImage imgPlayerGreen = null;
     BufferedImage imgPlayerPurple = null;
 
-    // instructions and credits images
+    // 4. Load Full-Screen Overlays
     BufferedImage imgInstructionPage = null;
     BufferedImage imgCreditsPage = null;
     BufferedImage imgHomeScreen = null;
 
-    boolean choosingNetworkRole = false;
-
-    // Methods
+    // === METHODS ===
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
@@ -126,7 +124,6 @@ public class GameView extends JPanel {
                             g.drawImage(imgSandCracked, c * 80, r * 80, null);
                         } 
                     }
-
                 }
             }
         
