@@ -626,6 +626,7 @@ public class GameModel implements ActionListener, KeyListener {
         if (thePanel.intGameState == 2) {
             if (evt.getSource() == backButton) {
                 thePanel.intGameState = 0;
+                playerList.clear();
             } 
         }
             
