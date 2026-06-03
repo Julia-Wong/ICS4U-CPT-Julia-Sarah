@@ -165,36 +165,36 @@ public class GameView extends JPanel {
         super();
         
         // 1. Load Map Tiles
-        imgSnowFull = loadImage(".media/fullSnowTile.png");
-        imgSnowSlightlyCracked = loadImage(".media/slightlyCrackedSnowTile.png");
-        imgSnowCracked = loadImage(".media/crackedSnowTile.png");
+        imgSnowFull = loadImage("media/fullSnowTile.png");
+        imgSnowSlightlyCracked = loadImage("media/slightlyCrackedSnowTile.png");
+        imgSnowCracked = loadImage("media/crackedSnowTile.png");
 
-        imgGrassFull = loadImage(".media/fullGrassTile.png");
-        imgGrassSlightlyCracked = loadImage(".media/slightlyCrackedGrassTile.png");
-        imgGrassCracked = loadImage(".media/crackedGrassTile.png");
+        imgGrassFull = loadImage("media/fullGrassTile.png");
+        imgGrassSlightlyCracked = loadImage("media/slightlyCrackedGrassTile.png");
+        imgGrassCracked = loadImage("media/crackedGrassTile.png");
 
-        imgDirtFull = loadImage(".media/fullDirtTile.png");
-        imgDirtSlightlyCracked = loadImage(".media/slightlyCrackedDirtTile.png");
-        imgDirtCracked = loadImage(".media/crackedDirtTile.png");
+        imgDirtFull = loadImage("media/fullDirtTile.png");
+        imgDirtSlightlyCracked = loadImage("media/slightlyCrackedDirtTile.png");
+        imgDirtCracked = loadImage("media/crackedDirtTile.png");
 
-        imgStoneFull = loadImage(".media/fullStoneTile.png");
-        imgStoneSlightlyCracked = loadImage(".media/slightlyCrackedStoneTile.png");
-        imgStoneCracked = loadImage(".media/crackedStoneTile.png");
+        imgStoneFull = loadImage("media/fullStoneTile.png");
+        imgStoneSlightlyCracked = loadImage("media/slightlyCrackedStoneTile.png");
+        imgStoneCracked = loadImage("media/crackedStoneTile.png");
 
-        imgSandFull = loadImage(".media/fullSandTile.png");
-        imgSandSlightlyCracked = loadImage(".media/slightlyCrackedSandTile.png");
-        imgSandCracked = loadImage(".media/crackedSandTile.png");
+        imgSandFull = loadImage("media/fullSandTile.png");
+        imgSandSlightlyCracked = loadImage("media/slightlyCrackedSandTile.png");
+        imgSandCracked = loadImage("media/crackedSandTile.png");
 
         // 2. Load Player Images
-        imgPlayerRed = loadImage(".media/playerRed.png");
-        imgPlayerBlue = loadImage(".media/playerBlue.png");
-        imgPlayerGreen = loadImage(".media/playerGreen.png");
-        imgPlayerPurple = loadImage(".media/playerPurple.png");
+        imgPlayerRed = loadImage("media/playerRed.png");
+        imgPlayerBlue = loadImage("media/playerBlue.png");
+        imgPlayerGreen = loadImage("media/playerGreen.png");
+        imgPlayerPurple = loadImage("media/playerPurple.png");
 
         // 3. Load Full-Screen UI Overlays
-        imgInstructionPage = loadImage(".media/instructionsPage.png");
-        imgCreditsPage = loadImage(".media/creditsPage.png");
-        imgHomeScreen = loadImage(".media/homescreenSpleefBg.png");
+        imgInstructionPage = loadImage("media/instructionsPage.png");
+        imgCreditsPage = loadImage("media/creditsPage.png");
+        imgHomeScreen = loadImage("media/homescreenSpleefBg.png");
 
         // 4. Assign Tile Images to 2D Array
         tileImages = new BufferedImage[][] {
