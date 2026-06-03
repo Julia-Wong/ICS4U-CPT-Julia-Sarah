@@ -8,14 +8,7 @@ import java.util.ArrayList;
 public class GameView extends JPanel { 
     // === PROPERTIES ===
 
-    // 1. Game Data
-    int intGameState = 0; // 0=home, 1=lobby, 2=help, 3=credits, 4=play, 5=gameover, 6=demo
-    int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
-    int[][] tileHealth = new int[9][16]; // 0=full, 1=slightly cracked, 2=cracked, 3=air(void)
-    ArrayList<Player> currentPlayers = new ArrayList<Player>();
-    boolean choosingNetworkRole = false;
-
-    // 2. Load Tile Graphics
+    // 1. Load Tile Graphics
     BufferedImage imgSnowFull = null;
     BufferedImage imgSnowSlightlyCracked = null;
     BufferedImage imgSnowCracked = null;
@@ -36,114 +29,85 @@ public class GameView extends JPanel {
     BufferedImage imgSandSlightlyCracked = null;
     BufferedImage imgSandCracked = null;
 
-    // 3. Load Player Graphics
+    // 2. Load Player Graphics
     BufferedImage imgPlayerRed = null;
     BufferedImage imgPlayerBlue = null;
     BufferedImage imgPlayerGreen = null;
     BufferedImage imgPlayerPurple = null;
 
-    // 4. Load Full-Screen Overlays
+    // 3. Load Full-Screen Overlays
     BufferedImage imgInstructionPage = null;
     BufferedImage imgCreditsPage = null;
     BufferedImage imgHomeScreen = null;
 
+    // 4. Game Data
+    int intGameState = 0; // 0=home, 1=lobby, 2=help, 3=credits, 4=play, 5=gameover, 6=demo
+    int[][] map = new int[9][16]; // 0=snow, 1=grass, 2=dirt, 3=stone, 4=sand
+    int[][] tileHealth = new int[9][16]; // 0=full, 1=slightly cracked, 2=cracked, 3=air(void)
+    ArrayList<Player> currentPlayers = new ArrayList<Player>();
+    boolean choosingNetworkRole = false;
+    BufferedImage[][] tileImages = new BufferedImage[5][3];
+
     // === METHODS ===
+    /**
+     * Automatically triggered on repaint requests to paint backgrounds,
+     * graphics, maps, and players.
+     * @param g The Graphics painting tool
+     */
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
-        if (intGameState == 0) { // home
+        // 1. Home
+        if (intGameState == 0) {
             if (imgHomeScreen != null) {
                 g.drawImage(imgHomeScreen, 0, 0, null);
             }
-        } else if (intGameState == 1) { // lobby
+        } 
+        
+        // 2. Lobby
+        else if (intGameState == 1) {
             if (choosingNetworkRole == false && currentPlayers != null) {
-                for (Player p: currentPlayers) {
-                    if (p.strColour != null) {
-                        if (p.strColour.equals("Red")) {
-                            g.drawImage(imgPlayerRed, 300, 300, null);
-                        } else if (p.strColour.equals("Blue")) {
-                            g.drawImage(imgPlayerBlue, 400, 300, null);
-                        } else if (p.strColour.equals("Green")) {
-                            g.drawImage(imgPlayerGreen, 500, 300, null);
-                        } else if (p.strColour.equals("Purple")) {
-                            g.drawImage(imgPlayerPurple, 600, 300, null);
-                        } 
-                    }
+                // Display all current players in the server
+                for (int i = 0; i < currentPlayers.size(); i++) {
+                    Player p = currentPlayers.get(i);
+                    BufferedImage spriteToDraw = getPlayerSprite(p.strColour);
+                    g.drawImage(spriteToDraw, i * 100 + 300, 300, null);
                 }
             }
-        } else if (intGameState == 2) { // help
+        } 
+        
+        // 3. Background Graphic Layouts
+        else if (intGameState == 2) { // Help page
             g.drawImage(imgInstructionPage, 0, 0,null);
-        } else if (intGameState == 3) { // credits
+        } else if (intGameState == 3) { // Credits page
             g.drawImage(imgCreditsPage, 0, 0,null);
-        } else if (intGameState == 4 || intGameState == 6) { // play
+        } 
+        
+        // 4. Gameplay/DEMO
+        else if (intGameState == 4 || intGameState == 6) {
             g.setColor(Color.BLACK);
             g.fillRect(0, 0, 1280, 720);
 
-            // draw map
+            // Draw map
             for (int r = 0; r < map.length; r++) {
                 for (int c = 0; c < map[r].length; c++) {
+                    int type = map[r][c];
+                    int health = tileHealth[r][c];
 
-                    if (map[r][c] == 0) { // draw snow
-                        if (tileHealth[r][c] == 0 && imgSnowFull != null) {
-                            g.drawImage(imgSnowFull, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 1 && imgSnowSlightlyCracked != null) {
-                            g.drawImage(imgSnowSlightlyCracked, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 2 && imgSnowCracked != null) {
-                            g.drawImage(imgSnowCracked, c * 80, r * 80, null);
-                        } 
-                    } else if (map[r][c] == 1) { // draw grass
-                        if (tileHealth[r][c] == 0 && imgGrassFull != null) {
-                            g.drawImage(imgGrassFull, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 1 && imgGrassSlightlyCracked != null) {
-                            g.drawImage(imgGrassSlightlyCracked, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 2 && imgGrassCracked != null) {
-                            g.drawImage(imgGrassCracked, c * 80, r * 80, null);
-                        } 
-                    } else if (map[r][c] == 2) { // draw dirt
-                        if (tileHealth[r][c] == 0 && imgDirtFull != null) {
-                            g.drawImage(imgDirtFull, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 1 && imgDirtSlightlyCracked != null) {
-                            g.drawImage(imgDirtSlightlyCracked, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 2 && imgDirtCracked != null) {
-                            g.drawImage(imgDirtCracked, c * 80, r * 80, null);
-                        } 
-                    } else if (map[r][c] == 3) { // draw stone
-                        if (tileHealth[r][c] == 0 && imgStoneFull != null) {
-                            g.drawImage(imgStoneFull, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 1 && imgStoneSlightlyCracked != null) {
-                            g.drawImage(imgStoneSlightlyCracked, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 2 && imgStoneCracked != null) {
-                            g.drawImage(imgStoneCracked, c * 80, r * 80, null);
-                        } 
-                    } else if (map[r][c] == 4) { // draw sand
-                        if (tileHealth[r][c] == 0 && imgSandFull != null) {
-                            g.drawImage(imgSandFull, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 1 && imgSandSlightlyCracked != null) {
-                            g.drawImage(imgSandSlightlyCracked, c * 80, r * 80, null);
-                        } else if (tileHealth[r][c] == 2 && imgSandCracked != null) {
-                            g.drawImage(imgSandCracked, c * 80, r * 80, null);
-                        } 
+                    if (health >= 0 && health < 3 && type >= 0 && type < 5) {
+                        BufferedImage currentImg = tileImages[type][health];
+
+                        if (currentImg != null) {
+                            g.drawImage(currentImg, c * 80, r * 80, null);
+                        }
                     }
                 }
             }
         
-            // draw players
+            // Draw players
             for (Player p: currentPlayers) {
                 if (p.isAlive) {
-                    BufferedImage spriteToDraw = null;
-                    // match colour to img character
-                    if (p.strColour != null) {
-                        if (p.strColour.equals("Red")) {
-                            spriteToDraw = imgPlayerRed;
-                        } else if (p.strColour.equals("Blue")) {
-                            spriteToDraw = imgPlayerBlue;
-                        } else if (p.strColour.equals("Green")) {
-                            spriteToDraw = imgPlayerGreen;
-                        } else if (p.strColour.equals("Purple")) {
-                            spriteToDraw = imgPlayerPurple;
-                        }
-                    }
-
+                    BufferedImage spriteToDraw = getPlayerSprite(p.strColour);
                     // draw players
                     if (spriteToDraw != null) {
                         g.drawImage(spriteToDraw, p.intX, p.intY, null);
@@ -151,19 +115,56 @@ public class GameView extends JPanel {
                 }
             }
 
-        } else if (intGameState == 5) { // end screen
-
         }
-
-        // Draw Images/Add images here
-
     }
 
-    // Constructor
+    /**
+     * Assigns a player's sprite based on their player's string colour.
+     * @param colour The string identifier of the player's colour.
+     * @return The corresponding BufferedImage, or null if the colour is invalid.
+     */
+    public BufferedImage getPlayerSprite(String colour) {
+        if (colour == null) {
+            return null;
+        } else if (colour.equals("Red")) {
+            return imgPlayerRed;
+        } else if (colour.equals("Blue")) {
+            return imgPlayerBlue;
+        } else if (colour.equals("Green")) {
+            return imgPlayerGreen;
+        } else if (colour.equals("Purple")) {
+            return imgPlayerPurple;
+        }
+        return null;
+    }
+
+    /**
+     * Locates and reads image files.
+     * @param file The relative path of the target image.
+     * @return The constructed BufferedImage, or null if the file is missing/corrupt.
+     */
+    public BufferedImage loadImage(String file) {
+        try {
+            BufferedImage tempImage = ImageIO.read(new File(file));
+            return tempImage;
+        } catch (FileNotFoundException e){
+            System.out.println("Error: File not found: " + file);
+        } catch (IOException e) {
+            System.out.println("Error: Error accessing file: " + file);
+        }
+        return null;
+    }
+
+    // === CONSTRUCTOR ===
+
+    /**
+     * Initializes the GameView panel and pre-loads all graphics such as
+     * tiles, players, and background overlays.
+     */
     public GameView(){
         super();
         
-        // load image tiles
+        // 1. Load Map Tiles
         imgSnowFull = loadImage(".media/fullSnowTile.png");
         imgSnowSlightlyCracked = loadImage(".media/slightlyCrackedSnowTile.png");
         imgSnowCracked = loadImage(".media/crackedSnowTile.png");
@@ -184,29 +185,24 @@ public class GameView extends JPanel {
         imgSandSlightlyCracked = loadImage(".media/slightlyCrackedSandTile.png");
         imgSandCracked = loadImage(".media/crackedSandTile.png");
 
-        // load player images
+        // 2. Load Player Images
         imgPlayerRed = loadImage(".media/playerRed.png");
         imgPlayerBlue = loadImage(".media/playerBlue.png");
         imgPlayerGreen = loadImage(".media/playerGreen.png");
         imgPlayerPurple = loadImage(".media/playerPurple.png");
 
-        // load instructions, credits, home, lobby, end screen pages
+        // 3. Load Full-Screen UI Overlays
         imgInstructionPage = loadImage(".media/instructionsPage.png");
         imgCreditsPage = loadImage(".media/creditsPage.png");
         imgHomeScreen = loadImage(".media/homescreenSpleefBg.png");
 
+        // 4. Assign Tile Images to 2D Array
+        tileImages = new BufferedImage[][] {
+            {imgSnowFull, imgSnowSlightlyCracked, imgSnowCracked},
+            {imgGrassFull, imgGrassSlightlyCracked, imgGrassCracked},
+            {imgDirtFull, imgDirtSlightlyCracked, imgDirtCracked},
+            {imgStoneFull, imgStoneSlightlyCracked, imgStoneCracked},
+            {imgSandFull, imgSandSlightlyCracked, imgSandCracked}
+        };
     }  
-    
-    public BufferedImage loadImage(String file) {
-        try {
-            BufferedImage tempImage = ImageIO.read(new File(file));
-            return tempImage;
-        } catch (FileNotFoundException e){
-            System.out.println("Error: File not found" + file);
-        } catch (IOException e) {
-            System.out.println("Error: Error accessing file" + file);
-        }
-        return null;
-
-    }
 }
