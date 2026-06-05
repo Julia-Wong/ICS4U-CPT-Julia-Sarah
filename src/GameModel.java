@@ -58,7 +58,7 @@ public class GameModel implements ActionListener, KeyListener {
     // 6. Playable DEMO Buttons
     JButton demoButton = new JButton("Demo");
     JButton demoResetButton = new JButton("Reset Demo");
-    JButton demoBackButton = new JButton("Exit Demo");
+    JButton demoBackButton = new JButton("Exit");
 
     // 7. Post-Game Layout
     JLabel gameOverLabel = new JLabel("Game Over!");
@@ -867,7 +867,7 @@ public class GameModel implements ActionListener, KeyListener {
         thePanel.add(backButton);
 
         // 4. Tutorial/DEMO
-        demoButton.setBounds(765, 655, 50, 55);
+        demoButton.setBounds(540, 640, 200, 55);
         demoButton.addActionListener(this);
         thePanel.add(demoButton);
 
@@ -880,52 +880,52 @@ public class GameModel implements ActionListener, KeyListener {
         thePanel.add(demoBackButton);
 
         // 5. Game Setup: Choose Role
-        chooseRoleLabel.setBounds(420, 220, 400, 50);
+        chooseRoleLabel.setBounds(420, 220-150, 400, 50);
         thePanel.add(chooseRoleLabel);
 
-        chooseHostButton.setBounds(420, 270, 100, 50);
+        chooseHostButton.setBounds(420, 270-150, 100, 50);
         chooseHostButton.addActionListener(this);
         thePanel.add(chooseHostButton);
 
-        chooseJoinButton.setBounds(620, 270, 100, 50);
+        chooseJoinButton.setBounds(620, 270-150, 100, 50);
         chooseJoinButton.addActionListener(this);
         thePanel.add(chooseJoinButton);
 
         // 6. Game Setup: Enter IP Address
-        enterIPAddressLabel.setBounds(420, 300, 400, 50);
+        enterIPAddressLabel.setBounds(420, 300-150+20, 400, 50);
         thePanel.add(enterIPAddressLabel);
 
-        enterIPAddress.setBounds(425, 350, 400, 50);
+        enterIPAddress.setBounds(425, 350-150+20, 400, 50);
         enterIPAddress.addActionListener(this);
         thePanel.add(enterIPAddress);
 
         // 7. Game Setup: Choose Player Colour
-        choosePlayerColourLabel.setBounds(420, 400, 400, 50);
+        choosePlayerColourLabel.setBounds(420, 400-125, 400, 50);
         thePanel.add(choosePlayerColourLabel);
 
-        redButton.setBounds(350, 450, 100, 100);
+        redButton.setBounds(350+70, 450-125, 100, 100);
         // redButton.setBackground(Color.RED);
         redButton.addActionListener(this);
         thePanel.add(redButton);
 
-        blueButton.setBounds(450, 450, 100, 100);
+        blueButton.setBounds(450+70, 450-125, 100, 100);
         // blueButton.setForeground(Color.WHITE);
         // blueButton.setBackground(Color.BLUE);
         blueButton.addActionListener(this);
         thePanel.add(blueButton);
 
-        greenButton.setBounds(550, 450, 100, 100);
+        greenButton.setBounds(550+70, 450-125, 100, 100);
         // greenButton.setBackground(Color.GREEN);
         greenButton.addActionListener(this);
         thePanel.add(greenButton);
 
-        purpleButton.setBounds(650, 450, 100, 100);
+        purpleButton.setBounds(650+70, 450-125, 100, 100);
         // purpleButton.setBackground(Color.MAGENTA);
         purpleButton.addActionListener(this);
         thePanel.add(purpleButton);
 
         // 8. Game Setup: Confirm Role
-        confirmRoleButton.setBounds(700, 650, 100, 50);
+        confirmRoleButton.setBounds((1280-100)/2, 650, 100, 50);
         confirmRoleButton.addActionListener(this);
         thePanel.add(confirmRoleButton);
 
@@ -933,39 +933,39 @@ public class GameModel implements ActionListener, KeyListener {
         thePanel.add(setupErrorLabel);
 
         // 9. Host-Specific Game Settings: Difficulty Level
-        chooseDifficultyLabel.setBounds(420, 500, 400, 50);
+        chooseDifficultyLabel.setBounds(420, 500-50, 400, 50);
         thePanel.add(chooseDifficultyLabel);
 
-        easyButton.setBounds(350, 550, 100, 100);
+        easyButton.setBounds(350+70, 550-50, 100, 100);
         easyButton.addActionListener(this);
         thePanel.add(easyButton);
 
-        mediumButton.setBounds(450, 550, 100, 100);
+        mediumButton.setBounds(450+70, 550-50, 100, 100);
         mediumButton.addActionListener(this);
         thePanel.add(mediumButton);
 
-        hardButton.setBounds(550, 550, 100, 100);
+        hardButton.setBounds(550+70, 550-50, 100, 100);
         hardButton.addActionListener(this);
         thePanel.add(hardButton);
 
         // 10. Host-Specific Game Settings: Map Choice
-        chooseMapLabel.setBounds(500, 400, 400, 100);
+        chooseMapLabel.setBounds(500, 400-20, 400, 100);
         thePanel.add(chooseMapLabel);
 
-        alpineTundraMapButton.setBounds(100, 500, 300, 100);
+        alpineTundraMapButton.setBounds((1280-900)/3, 500-20, 300, 100);
         alpineTundraMapButton.addActionListener(this);
         thePanel.add(alpineTundraMapButton);
 
-        oasisDesertMapButton.setBounds(400, 500, 300, 100);
+        oasisDesertMapButton.setBounds((1280-900)/3 + 320, 500-20, 300, 100);
         oasisDesertMapButton.addActionListener(this);
         thePanel.add(oasisDesertMapButton);
 
-        floatingIslandMapButton.setBounds(700, 500, 300, 100);
+        floatingIslandMapButton.setBounds((1280-900)/3 + 640, 500-20, 300, 100);
         floatingIslandMapButton.addActionListener(this);
         thePanel.add(floatingIslandMapButton);
 
         // 11. Host-Specific Game Settings: Play
-        playButton.setBounds(500, 600, 400, 100);
+        playButton.setBounds((1280-400)/2, 600, 400, 100);
         playButton.addActionListener(this);
         thePanel.add(playButton);
 
