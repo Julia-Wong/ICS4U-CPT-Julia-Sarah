@@ -949,18 +949,18 @@ public class GameModel implements ActionListener, KeyListener {
         thePanel.add(hardButton);
 
         // 10. Host-Specific Game Settings: Map Choice
-        chooseMapLabel.setBounds(500, 400-20, 400, 100);
+        chooseMapLabel.setBounds(440, 400-20, 400, 100);
         thePanel.add(chooseMapLabel);
 
-        alpineTundraMapButton.setBounds((1280-900)/3, 500-20, 300, 100);
+        alpineTundraMapButton.setBounds(170, 500-20, 300, 100);
         alpineTundraMapButton.addActionListener(this);
         thePanel.add(alpineTundraMapButton);
 
-        oasisDesertMapButton.setBounds((1280-900)/3 + 320, 500-20, 300, 100);
+        oasisDesertMapButton.setBounds(170 + 320, 500-20, 300, 100);
         oasisDesertMapButton.addActionListener(this);
         thePanel.add(oasisDesertMapButton);
 
-        floatingIslandMapButton.setBounds((1280-900)/3 + 640, 500-20, 300, 100);
+        floatingIslandMapButton.setBounds(170 + 640, 500-20, 300, 100);
         floatingIslandMapButton.addActionListener(this);
         thePanel.add(floatingIslandMapButton);
 
@@ -973,7 +973,7 @@ public class GameModel implements ActionListener, KeyListener {
         playersConnectedLabel.setBounds(500, 200, 400, 100);
         thePanel.add(playersConnectedLabel);
 
-        joiningIPInfo.setBounds(600, 400, 500, 50);
+        joiningIPInfo.setBounds(600, 400-20, 500, 100);
         thePanel.add(joiningIPInfo);
 
         // 13. Lobby Chat
