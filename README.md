@@ -22,3 +22,6 @@ Inspired by the Minecraft game Spleef, this game was created to support up to 4 
 3. If you fall into a hole, you be eliminated
 4. Whoever is the last remaining player wins! If all remaining players fall at the same time, the match ends in a draw
 5. Make sure you have fun!
+
+### Gameplay
+![Gameplay Image](image.png)
