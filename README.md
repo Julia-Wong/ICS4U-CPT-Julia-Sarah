@@ -24,4 +24,4 @@ Inspired by the Minecraft game Spleef, this game was created to support up to 4 
 5. Make sure you have fun!
 
 ### Gameplay
-![Gameplay Image](image.png)
+<img width="1279" height="720" alt="image" src="https://github.com/user-attachments/assets/a7cf39e8-87c3-4ff3-861a-5b23e67ac60e" />
