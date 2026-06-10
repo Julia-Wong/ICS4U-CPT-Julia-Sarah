@@ -841,6 +841,90 @@ public class GameModel implements ActionListener, KeyListener {
         }
     }
 
+    /**
+     * Manages GUI visibility based on current state.
+     */
+    public void showCurrentGUI() {
+        // 1. Declare All Game States & Sync Players
+        boolean isHome = thePanel.intGameState == 0;
+
+        boolean isLobby = thePanel.intGameState == 1;
+        boolean isLobbySetup = isLobby && thePanel.choosingNetworkRole;
+        boolean isLobbySetupHost = isLobbySetup && chooseRole == 0;
+        boolean isLobbySetupJoiner = isLobbySetup && chooseRole == 1;
+        boolean isLobbySetupGeneral = isLobbySetup && chooseRole != -1;
+
+        boolean isLobbyGeneral = isLobby && !thePanel.choosingNetworkRole;
+        boolean isLobbyHost = isLobbyGeneral && chooseRole == 0;
+
+
+        boolean isHelp = thePanel.intGameState == 2;
+
+        boolean isCredits = thePanel.intGameState == 3;
+
+        boolean isEndScreen = thePanel.intGameState == 5;
+
+        boolean isDemo = thePanel.intGameState == 6;
+        boolean playerIsDead = playerList.isEmpty() || !playerList.get(0).isAlive;
+
+        thePanel.currentPlayers = this.playerList;
+        thePanel.repaint();
+
+        // 2. Home Screen
+        lobbyButton.setVisible(isHome);
+        helpButton.setVisible(isHome);
+        creditsButton.setVisible(isHome);
+        backButton.setVisible(isLobby || isHelp || isCredits);
+
+        // 3. Lobby Setup: Choose Role
+        chooseRoleLabel.setVisible(isLobbySetup);
+        chooseHostButton.setVisible(isLobbySetup);
+        chooseJoinButton.setVisible(isLobbySetup);
+
+        // 4. Lobby Setup: Host Role
+        chooseDifficultyLabel.setVisible(isLobbySetupHost);
+        easyButton.setVisible(isLobbySetupHost);
+        mediumButton.setVisible(isLobbySetupHost);
+        hardButton.setVisible(isLobbySetupHost);
+
+        // 5. Lobby Setup: Joiner Role
+        enterIPAddressLabel.setVisible(isLobbySetupJoiner);
+        enterIPAddress.setVisible(isLobbySetupJoiner);
+
+        // 6. Lobby Setup: General GUI
+        choosePlayerColourLabel.setVisible(isLobbySetupGeneral);
+        redButton.setVisible(isLobbySetupGeneral);
+        blueButton.setVisible(isLobbySetupGeneral);
+        greenButton.setVisible(isLobbySetupGeneral);
+        purpleButton.setVisible(isLobbySetupGeneral);
+
+        confirmRoleButton.setVisible(isLobbySetup);
+        setupErrorLabel.setVisible(isLobbySetup);
+
+        // 7. Lobby: General GUI
+        playersConnectedLabel.setVisible(isLobbyGeneral);
+        scrollChatArea.setVisible(isLobbyGeneral);
+        chatInput.setVisible(isLobbyGeneral);
+
+        // 8. Lobby: Host GUI
+        joiningIPInfo.setVisible(isLobbyHost);
+        chooseMapLabel.setVisible(isLobbyHost);
+        alpineTundraMapButton.setVisible(isLobbyHost);
+        oasisDesertMapButton.setVisible(isLobbyHost);
+        floatingIslandMapButton.setVisible(isLobbyHost);
+        playButton.setVisible(isLobbyHost);
+
+        // 9. DEMO Screen
+        demoButton.setVisible(isHelp);
+        demoBackButton.setVisible(isDemo);
+        demoResetButton.setVisible(isDemo && playerIsDead);
+
+        // 10. Game Over Screen
+        gameOverLabel.setVisible(isEndScreen);
+        winnerLabel.setVisible(isEndScreen);
+        homeButton.setVisible(isEndScreen);
+    }
+
     // === CONSTRUCTOR ===
     public GameModel(){
         // 1. Game Setup
@@ -1002,90 +1086,6 @@ public class GameModel implements ActionListener, KeyListener {
         theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         theFrame.pack();
         theFrame.setVisible(true);
-    }
-
-    /**
-     * Manages GUI visibility based on current state.
-     */
-    public void showCurrentGUI() {
-        // 1. Declare All Game States & Sync Players
-        boolean isHome = thePanel.intGameState == 0;
-
-        boolean isLobby = thePanel.intGameState == 1;
-        boolean isLobbySetup = isLobby && thePanel.choosingNetworkRole;
-        boolean isLobbySetupHost = isLobbySetup && chooseRole == 0;
-        boolean isLobbySetupJoiner = isLobbySetup && chooseRole == 1;
-        boolean isLobbySetupGeneral = isLobbySetup && chooseRole != -1;
-
-        boolean isLobbyGeneral = isLobby && !thePanel.choosingNetworkRole;
-        boolean isLobbyHost = isLobbyGeneral && chooseRole == 0;
-
-
-        boolean isHelp = thePanel.intGameState == 2;
-
-        boolean isCredits = thePanel.intGameState == 3;
-
-        boolean isEndScreen = thePanel.intGameState == 5;
-
-        boolean isDemo = thePanel.intGameState == 6;
-        boolean playerIsDead = playerList.isEmpty() || !playerList.get(0).isAlive;
-
-        thePanel.currentPlayers = this.playerList;
-        thePanel.repaint();
-
-        // 2. Home Screen
-        lobbyButton.setVisible(isHome);
-        helpButton.setVisible(isHome);
-        creditsButton.setVisible(isHome);
-        backButton.setVisible(isLobby || isHelp || isCredits);
-
-        // 3. Lobby Setup: Choose Role
-        chooseRoleLabel.setVisible(isLobbySetup);
-        chooseHostButton.setVisible(isLobbySetup);
-        chooseJoinButton.setVisible(isLobbySetup);
-
-        // 4. Lobby Setup: Host Role
-        chooseDifficultyLabel.setVisible(isLobbySetupHost);
-        easyButton.setVisible(isLobbySetupHost);
-        mediumButton.setVisible(isLobbySetupHost);
-        hardButton.setVisible(isLobbySetupHost);
-
-        // 5. Lobby Setup: Joiner Role
-        enterIPAddressLabel.setVisible(isLobbySetupJoiner);
-        enterIPAddress.setVisible(isLobbySetupJoiner);
-
-        // 6. Lobby Setup: General GUI
-        choosePlayerColourLabel.setVisible(isLobbySetupGeneral);
-        redButton.setVisible(isLobbySetupGeneral);
-        blueButton.setVisible(isLobbySetupGeneral);
-        greenButton.setVisible(isLobbySetupGeneral);
-        purpleButton.setVisible(isLobbySetupGeneral);
-
-        confirmRoleButton.setVisible(isLobbySetup);
-        setupErrorLabel.setVisible(isLobbySetup);
-
-        // 7. Lobby: General GUI
-        playersConnectedLabel.setVisible(isLobbyGeneral);
-        scrollChatArea.setVisible(isLobbyGeneral);
-        chatInput.setVisible(isLobbyGeneral);
-
-        // 8. Lobby: Host GUI
-        joiningIPInfo.setVisible(isLobbyHost);
-        chooseMapLabel.setVisible(isLobbyHost);
-        alpineTundraMapButton.setVisible(isLobbyHost);
-        oasisDesertMapButton.setVisible(isLobbyHost);
-        floatingIslandMapButton.setVisible(isLobbyHost);
-        playButton.setVisible(isLobbyHost);
-
-        // 9. DEMO Screen
-        demoButton.setVisible(isHelp);
-        demoBackButton.setVisible(isDemo);
-        demoResetButton.setVisible(isDemo && playerIsDead);
-
-        // 10. Game Over Screen
-        gameOverLabel.setVisible(isEndScreen);
-        winnerLabel.setVisible(isEndScreen);
-        homeButton.setVisible(isEndScreen);
     }
 
     // === MAIN PROGRAM ===
